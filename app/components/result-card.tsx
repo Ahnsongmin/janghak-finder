@@ -8,11 +8,20 @@ const CATEGORY_COLOR: Record<string, string> = {
 };
 
 export function ResultCard({ result }: { result: MatchResult }) {
-  const { benefit: b, passed, unknown } = result;
+  const { benefit: b, passed, unknown, status } = result;
 
   return (
     <article className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
       <div className="mb-2 flex flex-wrap items-center gap-2">
+        {status === "eligible" ? (
+          <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+            대상 가능
+          </span>
+        ) : (
+          <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+            조건 확인
+          </span>
+        )}
         <span
           className={`rounded-md border px-2 py-0.5 text-xs font-medium ${
             CATEGORY_COLOR[b.category] ?? CATEGORY_COLOR["기타"]
