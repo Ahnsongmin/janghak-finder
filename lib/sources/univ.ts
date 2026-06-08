@@ -66,9 +66,22 @@ export async function fetchUniversities(serviceKey: string, numOfRows = 500): Pr
     url.searchParams.set("pageNo", String(pageNo));
     url.searchParams.set("numOfRows", String(numOfRows));
 
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`대학 표준데이터 HTTP ${res.status}`);
-    const data = (await res.json()) as ApiResponse;
+    // 빌드 중 일시적 네트워크 실패 대비 재시도(백오프)
+    let data: ApiResponse | null = null;
+    for (let attempt = 1; attempt <= 4; attempt++) {
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          data = (await res.json()) as ApiResponse;
+          break;
+        }
+        if (attempt === 4) throw new Error(`대학 표준데이터 HTTP ${res.status}`);
+      } catch (e) {
+        if (attempt === 4) throw e;
+      }
+      await new Promise((r) => setTimeout(r, attempt * 800));
+    }
+    if (!data) break;
 
     const items = data.response?.body?.items ?? [];
     if (items.length === 0) break;
