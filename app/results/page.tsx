@@ -3,6 +3,10 @@ import { getBenefits, isDemoData, sourceNames } from "@/lib/store";
 import { matchAll } from "@/lib/match";
 import type { UserProfile } from "@/lib/types";
 import { ResultsView } from "@/app/components/results-view";
+import universities from "@/data/universities.json";
+
+type Univ = { name: string; homepage?: string; region?: string };
+const UNIV_BY_NAME = new Map((universities as Univ[]).map((u) => [u.name, u]));
 
 function buildProfile(sp: Record<string, string | string[] | undefined>): UserProfile {
   const get = (k: string) => (Array.isArray(sp[k]) ? sp[k]![0] : (sp[k] as string | undefined));
@@ -29,6 +33,9 @@ export default async function ResultsPage({
   const demo = isDemoData();
   const all = [...eligible, ...review];
 
+  const univName = (Array.isArray(sp.univ) ? sp.univ[0] : sp.univ)?.trim();
+  const univ = univName ? UNIV_BY_NAME.get(univName) : undefined;
+
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-10">
       <div className="mb-6 flex items-center justify-between">
@@ -49,6 +56,36 @@ export default async function ResultsPage({
         대상 가능 {eligible.length}건 · 조건 확인 필요 {review.length}건 · 제외 {excludedCount}건
         <span className="ml-2 text-zinc-400">(출처: {sourceNames().join(", ")})</span>
       </p>
+
+      {univName && (
+        <div className="mb-6 rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-sm">
+          <p className="font-semibold text-indigo-800">🎓 {univName} 교내장학금</p>
+          <p className="mt-1 text-indigo-700">
+            대학별 교내장학금(성적우수·근로·재단 등)은 정부 공개 데이터에 없어, 학교 공식 페이지에서 직접
+            확인해야 해요. 아래 링크로 바로 가세요.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {univ?.homepage && (
+              <a
+                href={univ.homepage}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700"
+              >
+                학교 홈페이지 →
+              </a>
+            )}
+            <a
+              href={`https://www.google.com/search?q=${encodeURIComponent(univName + " 장학금")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-indigo-300 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
+            >
+              ‘{univName} 장학금’ 검색 →
+            </a>
+          </div>
+        </div>
+      )}
 
       {all.length === 0 ? (
         <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center text-zinc-500">
