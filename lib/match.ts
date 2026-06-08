@@ -71,6 +71,22 @@ function checkTargetGroups(b: Benefit, u: UserProfile): { v: Verdict; msg: strin
     : { v: "fail", msg: `특정 대상 전용 (대상: ${groups.join("/")})` };
 }
 
+/** 대학명 느슨한 일치 (예: "서강대" ↔ "서강대학교") */
+function univMatches(selected: string, target: string): boolean {
+  const norm = (s: string) => s.replace(/대학교|대학|\s|\(.*?\)/g, "");
+  const a = norm(selected);
+  const b = norm(target);
+  return !!a && !!b && (a === b || a.includes(b) || b.includes(a));
+}
+
+function checkUniversity(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
+  if (!b.university) return { v: "pass", msg: "대학 무관" };
+  if (!u.univ) return { v: "fail", msg: `${b.university} 재학생 전용 — 대학 선택 시 표시` };
+  return univMatches(u.univ, b.university)
+    ? { v: "pass", msg: `${b.university} 교내장학금` }
+    : { v: "fail", msg: `${b.university} 전용` };
+}
+
 export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
   const checks = [
     checkRegion(benefit, user),
@@ -80,6 +96,7 @@ export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
     checkGrade(benefit, user),
     checkFlags(benefit, user),
     checkTargetGroups(benefit, user),
+    checkUniversity(benefit, user),
   ];
 
   const passed = checks.filter((c) => c.v === "pass").map((c) => c.msg);

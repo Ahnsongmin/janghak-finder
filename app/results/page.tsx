@@ -18,6 +18,7 @@ function buildProfile(sp: Record<string, string | string[] | undefined>): UserPr
     age: Number.isFinite(age) ? age : undefined,
     eduStatus: get("edu") ?? "",
     grade: Number(get("grade") ?? 0),
+    univ: get("univ") ?? "",
     flags: (get("flags") ?? "").split(",").filter(Boolean),
   };
 }

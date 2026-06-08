@@ -33,6 +33,9 @@ export interface Benefit {
   /** 대상 집단(이 중 하나라도 해당하면 대상, OR). 빈 배열이면 무관.
    *  복지로 '대상특성'(장애인/한부모/다자녀 등)처럼 "여러 대상군 중 하나" 조건에 사용 */
   targetGroups: string[];
+  /** 특정 대학 전용 교내장학금이면 그 대학명(universities.json 표기와 일치).
+   *  설정 시, 사용자가 그 대학을 선택했을 때만 노출 */
+  university?: string;
 
   // ── 표시/근거용 (매칭엔 안 쓰지만 사용자 검증에 필수) ──
   amount?: string;
@@ -60,6 +63,8 @@ export interface UserProfile {
   eduStatus: string;
   /** 학년 1~4(+). 0 = 모름/미선택 */
   grade: number;
+  /** 선택한 대학명. "" 이면 미선택 */
+  univ: string;
   /** 보유 특수자격 플래그 */
   flags: string[];
 }

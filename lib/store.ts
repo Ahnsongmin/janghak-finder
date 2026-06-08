@@ -1,12 +1,15 @@
 import type { Benefit } from "./types";
 import policiesData from "@/data/policies.json";
+import universityScholarships from "@/data/university-scholarships.json";
 
-// 데이터 저장소(MVP): 정규화된 장학금/지원금을 data/policies.json 에서 읽는다.
-// - 실데이터는 scripts/ingest.mjs 가 정부 공식 API에서 수집해 이 파일을 덮어쓴다.
-// - 아직 수집 전(키 미설정)이면 demo:true 예시 데이터만 들어 있다.
-// 후속(Phase 2): Postgres/KV + Vercel Cron 으로 교체해 런타임 자동 최신화.
+// 데이터 저장소(MVP): 정규화된 장학금/지원금을 합쳐서 읽는다.
+// - policies.json: 정부 공식 API 자동 수집(온통청년/복지로/대학목록). 빌드마다 갱신.
+// - university-scholarships.json: 대학 공식 페이지에서 수집한 교내장학금(수동 스냅샷, 출처링크 포함).
 
-const benefits = policiesData as unknown as Benefit[];
+const benefits = [
+  ...(policiesData as unknown as Benefit[]),
+  ...(universityScholarships as unknown as Benefit[]),
+];
 
 export function getBenefits(): Benefit[] {
   return benefits;

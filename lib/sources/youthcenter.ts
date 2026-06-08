@@ -99,7 +99,13 @@ function normalize(raw: RawPolicy, fetchedAt: string): Benefit {
     applyPeriod: raw.aplyYmd?.trim() || undefined,
     applyMethod: raw.plcyAplyMthdCn?.trim() || undefined,
     submitDocs: raw.sbmsnDcmntCn?.trim() || undefined,
-    applyUrl: raw.aplyUrlAddr?.trim() || undefined,
+    // 신청URL이 비어있는 정책이 많음 → 참고링크 → 온통청년 정책 상세페이지 순으로 폴백(항상 공식 링크 보장)
+    applyUrl:
+      raw.aplyUrlAddr?.trim() ||
+      raw.refUrlAddr1?.trim() ||
+      (raw.plcyNo
+        ? `https://www.youthcenter.go.kr/youthPolicy/ythPlcyTotalSearch/ythPlcyDetail/${raw.plcyNo}`
+        : undefined),
     refUrls: refUrls.length ? refUrls : undefined,
     rawConditionText: rawConditionText || undefined,
     lastFetchedAt: fetchedAt,
