@@ -119,9 +119,18 @@ export async function fetchYouthCenter(apiKey: string, pageSize = 100): Promise<
     url.searchParams.set("pageNum", String(pageNum));
     url.searchParams.set("pageSize", String(pageSize));
 
-    const res = await fetch(url, { headers: { Accept: "application/json" } });
-    if (!res.ok) throw new Error(`온통청년 API HTTP ${res.status}`);
-    const data = (await res.json()) as ApiResponse;
+    // 온통청년 API는 간헐적으로 500을 반환 → 최대 4회 재시도(백오프)
+    let data: ApiResponse | null = null;
+    for (let attempt = 1; attempt <= 4; attempt++) {
+      const res = await fetch(url, { headers: { Accept: "application/json" } });
+      if (res.ok) {
+        data = (await res.json()) as ApiResponse;
+        break;
+      }
+      if (attempt === 4) throw new Error(`온통청년 API HTTP ${res.status} (page ${pageNum})`);
+      await new Promise((r) => setTimeout(r, attempt * 800));
+    }
+    if (!data) break;
 
     const list = data.result?.youthPolicyList ?? [];
     if (list.length === 0) break;
