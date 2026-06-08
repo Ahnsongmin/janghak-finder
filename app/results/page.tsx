@@ -19,6 +19,7 @@ function buildProfile(sp: Record<string, string | string[] | undefined>): UserPr
     eduStatus: get("edu") ?? "",
     grade: Number(get("grade") ?? 0),
     univ: get("univ") ?? "",
+    major: get("major") ?? "",
     flags: (get("flags") ?? "").split(",").filter(Boolean),
   };
 }

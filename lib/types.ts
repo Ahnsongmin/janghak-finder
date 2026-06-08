@@ -36,6 +36,9 @@ export interface Benefit {
   /** 특정 대학 전용 교내장학금이면 그 대학명(universities.json 표기와 일치).
    *  설정 시, 사용자가 그 대학을 선택했을 때만 노출 */
   university?: string;
+  /** 특정 학과/전공 전용이면 해당 학과명 키워드 배열(예: ["전자공학", "인공지능"]).
+   *  설정 시, 사용자가 그 학과를 입력했을 때만 노출. 빈 배열/미설정이면 학과 무관 */
+  departments?: string[];
 
   // ── 표시/근거용 (매칭엔 안 쓰지만 사용자 검증에 필수) ──
   amount?: string;
@@ -65,6 +68,8 @@ export interface UserProfile {
   grade: number;
   /** 선택한 대학명. "" 이면 미선택 */
   univ: string;
+  /** 입력한 학과/전공. "" 이면 미입력 */
+  major: string;
   /** 보유 특수자격 플래그 */
   flags: string[];
 }

@@ -15,6 +15,7 @@ export default function Home() {
   const [eduStatus, setEduStatus] = useState("");
   const [grade, setGrade] = useState(0);
   const [univ, setUniv] = useState("");
+  const [major, setMajor] = useState("");
   const [flags, setFlags] = useState<string[]>([]);
 
   function toggleFlag(f: string) {
@@ -29,6 +30,7 @@ export default function Home() {
     if (eduStatus) p.set("edu", eduStatus);
     if (grade) p.set("grade", String(grade));
     if (univ) p.set("univ", univ);
+    if (major) p.set("major", major);
     if (flags.length) p.set("flags", flags.join(","));
     router.push(`/results?${p.toString()}`);
   }
@@ -133,6 +135,19 @@ export default function Home() {
               <option key={n} value={n} />
             ))}
           </datalist>
+        </div>
+
+        <div>
+          <label className={labelCls}>
+            학과 / 전공 <span className="font-normal text-zinc-400">(입력하면 학과별 장학금까지, 선택사항)</span>
+          </label>
+          <input
+            type="text"
+            className={fieldCls}
+            value={major}
+            onChange={(e) => setMajor(e.target.value)}
+            placeholder="예: 전자공학과, 기계공학과"
+          />
         </div>
 
         <div>

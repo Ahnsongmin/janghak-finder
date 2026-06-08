@@ -87,6 +87,23 @@ function checkUniversity(b: Benefit, u: UserProfile): { v: Verdict; msg: string 
     : { v: "fail", msg: `${b.university} 전용` };
 }
 
+/** 학과명 느슨한 일치 (예: "전자공학과" ↔ "전자공학") */
+function majorMatches(input: string, dept: string): boolean {
+  const norm = (s: string) => s.replace(/학과|학부|전공|공학과|\s/g, "");
+  const a = norm(input);
+  const b = norm(dept);
+  return !!a && !!b && (a.includes(b) || b.includes(a));
+}
+
+function checkDepartment(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
+  const depts = b.departments ?? [];
+  if (depts.length === 0) return { v: "pass", msg: "학과 무관" };
+  if (!u.major) return { v: "fail", msg: `${depts.join("/")} 학과 전용 — 학과 입력 시 표시` };
+  return depts.some((d) => majorMatches(u.major, d))
+    ? { v: "pass", msg: `${u.major} 해당 학과 장학금` }
+    : { v: "fail", msg: `${depts.join("/")} 학과 전용` };
+}
+
 export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
   const checks = [
     checkRegion(benefit, user),
@@ -97,6 +114,7 @@ export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
     checkFlags(benefit, user),
     checkTargetGroups(benefit, user),
     checkUniversity(benefit, user),
+    checkDepartment(benefit, user),
   ];
 
   const passed = checks.filter((c) => c.v === "pass").map((c) => c.msg);

@@ -53,6 +53,9 @@ const Extracted = z.object({
         .array(z.string())
         .describe("특수자격 키워드(있으면): 장애, 보훈, 북한이탈, 기초수급, 차상위, 다자녀, 한부모, 다문화 중 해당"),
       incomeRelated: z.boolean().describe("가계곤란/소득 연계 여부"),
+      departments: z
+        .array(z.string())
+        .describe("특정 학과/전공 전용이면 해당 학과명(예: 전자공학, 인공지능). 전체 학과 대상이면 빈 배열"),
       amount: z.string().describe("지원 금액 (예: 등록금 전액, 반액, 일정액). 없으면 빈 문자열"),
       conditionText: z.string().describe("자격조건 원문 요약 (학점·평점·기타). 페이지에 적힌 사실만"),
     }),
@@ -129,6 +132,7 @@ async function extractOne(
     grades: [],
     requiredFlags: normalizeFlags(s.requiredFlags ?? []),
     targetGroups: [],
+    departments: (s.departments ?? []).filter((d) => d.trim()),
     amount: s.amount?.trim() || undefined,
     applyUrl: url,
     rawConditionText:
