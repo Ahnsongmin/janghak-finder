@@ -19,7 +19,7 @@
     "amount": "수업료 전액·2/3·1/3·1/6·일정액",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 직전학기 12학점 이상 이수, 평점 2.0 이상 / 가계곤란 심사. 정확한 조건·일정은 서강대 학생지원팀(02-705-8217) 및 공식 페이지 확인.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:welfare",
@@ -41,7 +41,7 @@
     "amount": "수업료 전액·2/3·1/3·1/6·일정액",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 직전학기 12학점 이상, 평점 2.0 이상 / 가계곤란.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:prof",
@@ -63,7 +63,7 @@
     "amount": "수업료의 1/3·1/6",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 직전학기 15학점 이상, 평점 2.5 이상, 지도교수 추천.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:living",
@@ -84,7 +84,7 @@
     "amount": "일정액",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 수급자, 직전학기 12학점 이상, 평점 2.4 이상.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:xavier-service",
@@ -105,7 +105,7 @@
     "amount": "수업료의 2/3·1/3·1/6",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 총학생회 추천, 직전학기 12학점 이상, 평점 2.0 이상.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:xavier-disabled",
@@ -126,7 +126,7 @@
     "amount": "수업료의 2/3·1/3",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 장애학생, 직전학기 12학점 이상, 평점 2.0 이상.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:bohun",
@@ -147,7 +147,7 @@
     "amount": "수업료 전액(국고 포함)",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 보훈대상자, 성적 1.39 이상.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:nk",
@@ -168,7 +168,7 @@
     "amount": "수업료 전액(국고 포함)",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 북한이탈주민, 성적 1.39 이상.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:sibling",
@@ -189,7 +189,7 @@
     "amount": "수업료의 1/3",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 형제자매 동시 재적, 직전학기 15학점 이상, 평점 2.7 이상.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:work",
@@ -210,7 +210,7 @@
     "amount": "시간당 9,700원",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 교내 행정부서 근로 학생.",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   },
   {
     "id": "univ:sogang:admission",
@@ -231,155 +231,6 @@
     "amount": "입학년도 모집요강에 따름",
     "applyUrl": "https://www.sogang.ac.kr/bachelor/students/sch/sch01.html",
     "rawConditionText": "[자격] 수시/정시 합격자, 합격자 발표 시 선정. 학과별(인공지능·시스템반도체·전자공학 등) 별도 운영.",
-    "lastFetchedAt": "2026-06-08"
-  },
-
-  {
-    "id": "univ:yonsei:jinri",
-    "name": "진리장학금(성적우수)",
-    "category": "장학금",
-    "provider": "연세대학교",
-    "sourceName": "연세대학교(교내)",
-    "university": "연세대학교",
-    "description": "대학배정장학금 중 성적 우수 학생 대상(각 대학 추천).",
-    "regions": ["전국"],
-    "incomeMax": null,
-    "ageMin": null,
-    "ageMax": null,
-    "eduStatus": ["대학생(재학)"],
-    "grades": [],
-    "requiredFlags": [],
-    "targetGroups": [],
-    "amount": "등록금 전액/반액/1·3 (대학별 결정)",
-    "applyUrl": "https://www.yonsei.ac.kr/sc/292/subview.do",
-    "rawConditionText": "[자격] 직전학기 12학점 이상, 평량평균 2.50 이상. 1학년 2학기부터 신청. 휴학·학기초과생 제외.",
-    "lastFetchedAt": "2026-06-08"
-  },
-  {
-    "id": "univ:yonsei:jayu",
-    "name": "자유장학금(가계곤란)",
-    "category": "장학금",
-    "provider": "연세대학교",
-    "sourceName": "연세대학교(교내)",
-    "university": "연세대학교",
-    "description": "대학배정장학금 중 경제적으로 어려운 학생 대상(각 대학 추천).",
-    "regions": ["전국"],
-    "incomeMax": null,
-    "incomeNote": "가계곤란(경제 요건)",
-    "ageMin": null,
-    "ageMax": null,
-    "eduStatus": ["대학생(재학)"],
-    "grades": [],
-    "requiredFlags": [],
-    "targetGroups": [],
-    "amount": "등록금 전액/반액 (대학별 결정)",
-    "applyUrl": "https://www.yonsei.ac.kr/sc/292/subview.do",
-    "rawConditionText": "[자격] 직전학기 12학점 이상, 평량평균 2.50 이상, 경제 요건. 휴학·학기초과생 제외.",
-    "lastFetchedAt": "2026-06-08"
-  },
-  {
-    "id": "univ:yonsei:hanmaeum",
-    "name": "한마음장학금",
-    "category": "장학금",
-    "provider": "연세대학교",
-    "sourceName": "연세대학교(교내)",
-    "university": "연세대학교",
-    "description": "기초생활수급자~차상위 대상, 졸업 시까지 등록금 전액+도서비 지원(한마음전형 합격자).",
-    "regions": ["전국"],
-    "incomeMax": null,
-    "ageMin": null,
-    "ageMax": null,
-    "eduStatus": ["대학생(재학)"],
-    "grades": [],
-    "requiredFlags": [],
-    "targetGroups": ["기초생활수급자", "차상위계층"],
-    "amount": "등록금 전액 + 도서비",
-    "applyUrl": "https://www.yonsei.ac.kr/sc/292/subview.do",
-    "rawConditionText": "[자격] 한마음전형 합격, 기초수급~차상위 경제요건 유지, 직전학기 12학점 이상·평점 2.5 이상.",
-    "lastFetchedAt": "2026-06-08"
-  },
-  {
-    "id": "univ:yonsei:gosi",
-    "name": "국가고시 장학금",
-    "category": "장학금",
-    "provider": "연세대학교",
-    "sourceName": "연세대학교(교내)",
-    "university": "연세대학교",
-    "description": "재적 중 국가고시 합격자 대상.",
-    "regions": ["전국"],
-    "incomeMax": null,
-    "ageMin": null,
-    "ageMax": null,
-    "eduStatus": ["대학생(재학)"],
-    "grades": [],
-    "requiredFlags": [],
-    "targetGroups": [],
-    "amount": "1회 100만원",
-    "applyUrl": "https://www.yonsei.ac.kr/sc/292/subview.do",
-    "rawConditionText": "[자격] 재적 중 국가고시 합격, 합격증/합격확인서 원본 제출(필수 신청).",
-    "lastFetchedAt": "2026-06-08"
-  },
-  {
-    "id": "univ:yonsei:work",
-    "name": "교내 근로장학금",
-    "category": "장학금",
-    "provider": "연세대학교",
-    "sourceName": "연세대학교(교내)",
-    "university": "연세대학교",
-    "description": "학기 중 교내 근로 참여(의·치·간대 제외).",
-    "regions": ["전국"],
-    "incomeMax": null,
-    "ageMin": null,
-    "ageMax": null,
-    "eduStatus": ["대학생(재학)"],
-    "grades": [],
-    "requiredFlags": [],
-    "targetGroups": [],
-    "amount": "장학위원회 결정 금액",
-    "applyUrl": "https://www.yonsei.ac.kr/sc/292/subview.do",
-    "rawConditionText": "[자격] 직전학기 평량평균 1.4 이상, 학기 중 120시간 근무. 1학년 2학기부터 신청.",
-    "lastFetchedAt": "2026-06-08"
-  },
-  {
-    "id": "univ:yonsei:service",
-    "name": "봉사장학금",
-    "category": "장학금",
-    "provider": "연세대학교",
-    "sourceName": "연세대학교(교내)",
-    "university": "연세대학교",
-    "description": "총학생회·학생자치기구 봉사 학생(의·치·간대 제외).",
-    "regions": ["전국"],
-    "incomeMax": null,
-    "ageMin": null,
-    "ageMax": null,
-    "eduStatus": ["대학생(재학)"],
-    "grades": [],
-    "requiredFlags": [],
-    "targetGroups": [],
-    "amount": "학생복지처장 결정 금액",
-    "applyUrl": "https://www.yonsei.ac.kr/sc/292/subview.do",
-    "rawConditionText": "[자격] 직전학기 평량평균 1.75 이상, 봉사활동 참여.",
-    "lastFetchedAt": "2026-06-08"
-  },
-  {
-    "id": "univ:yonsei:vsp",
-    "name": "VSP장학금(교환학생)",
-    "category": "장학금",
-    "provider": "연세대학교",
-    "sourceName": "연세대학교(교내)",
-    "university": "연세대학교",
-    "description": "Visiting Student Program 파견 학생(국제처장 추천).",
-    "regions": ["전국"],
-    "incomeMax": null,
-    "ageMin": null,
-    "ageMax": null,
-    "eduStatus": ["대학생(재학)"],
-    "grades": [],
-    "requiredFlags": [],
-    "targetGroups": [],
-    "amount": "등록금의 80%",
-    "applyUrl": "https://www.yonsei.ac.kr/sc/292/subview.do",
-    "rawConditionText": "[자격] VSP 파견 학생, 국제처 신청(필수).",
-    "lastFetchedAt": "2026-06-08"
+    "lastFetchedAt": "2026-06-09"
   }
 ]
