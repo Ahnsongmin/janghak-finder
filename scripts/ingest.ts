@@ -7,6 +7,7 @@ import { writeFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fetchYouthCenter } from "../lib/sources/youthcenter";
 import { fetchBokjiro } from "../lib/sources/bokjiro";
+import { fetchUniversities } from "../lib/sources/univ";
 import type { Benefit } from "../lib/types";
 
 function loadEnv() {
@@ -60,7 +61,24 @@ async function main() {
     console.warn("⚠️  DATA_GO_KR_SERVICE_KEY 없음 → 복지로 건너뜀");
   }
 
-  // TODO(후속): 대학알리미(전국 대학+교내장학), 한국장학재단
+  // 전국 대학 목록(입력 폼 '대학 선택'용) → data/universities.json 에 별도 저장
+  if (dataKey) {
+    try {
+      console.log("[전국대학] 수집 시작…");
+      const univs = await fetchUniversities(dataKey);
+      const uniqByName = [...new Map(univs.map((u) => [u.name, u])).values()];
+      writeFileSync(
+        resolve(process.cwd(), "data", "universities.json"),
+        JSON.stringify(uniqByName, null, 2),
+        "utf8",
+      );
+      console.log(`[전국대학] ${univs.length}건 수집 → 중복제거 ${uniqByName.length}개 저장`);
+    } catch (e) {
+      console.error("[전국대학] 실패:", (e as Error).message);
+    }
+  }
+
+  // TODO(후속): 한국장학재단, 대학별 교내장학금(공개 API 없음 → 스크래핑 별도 검토)
 
   if (collected.length === 0) {
     console.warn("수집된 실데이터가 없습니다. 예시(demo) 데이터를 유지합니다.");

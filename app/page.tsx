@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SIDO, INCOME_OPTIONS, EDU_STATUS, GRADE_OPTIONS, SPECIAL_FLAGS } from "@/lib/options";
+import universities from "@/data/universities.json";
+
+const UNIV_NAMES = (universities as { name: string }[]).map((u) => u.name);
 
 export default function Home() {
   const router = useRouter();
@@ -11,6 +14,7 @@ export default function Home() {
   const [age, setAge] = useState("");
   const [eduStatus, setEduStatus] = useState("");
   const [grade, setGrade] = useState(0);
+  const [univ, setUniv] = useState("");
   const [flags, setFlags] = useState<string[]>([]);
 
   function toggleFlag(f: string) {
@@ -24,6 +28,7 @@ export default function Home() {
     if (age) p.set("age", age);
     if (eduStatus) p.set("edu", eduStatus);
     if (grade) p.set("grade", String(grade));
+    if (univ) p.set("univ", univ);
     if (flags.length) p.set("flags", flags.join(","));
     router.push(`/results?${p.toString()}`);
   }
@@ -109,6 +114,25 @@ export default function Home() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className={labelCls}>
+            대학교 <span className="font-normal text-zinc-400">(검색해서 선택, 선택사항)</span>
+          </label>
+          <input
+            type="text"
+            list="univ-list"
+            className={fieldCls}
+            value={univ}
+            onChange={(e) => setUniv(e.target.value)}
+            placeholder="학교명 입력 (예: 서강대)"
+          />
+          <datalist id="univ-list">
+            {UNIV_NAMES.map((n) => (
+              <option key={n} value={n} />
+            ))}
+          </datalist>
         </div>
 
         <div>
