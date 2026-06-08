@@ -28,6 +28,11 @@ export default async function ResultsPage({
   const { eligible, review, excludedCount } = matchAll(getBenefits(), user);
   const demo = isDemoData();
 
+  // 화면 과부하 방지: 섹션별 표시 상한 (전체 건수는 별도 표기)
+  const CAP = 40;
+  const eligibleShown = eligible.slice(0, CAP);
+  const reviewShown = review.slice(0, CAP);
+
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-10">
       <div className="mb-6 flex items-center justify-between">
@@ -59,26 +64,36 @@ export default async function ResultsPage({
       {eligible.length > 0 && (
         <section className="mb-8">
           <h2 className="mb-3 text-base font-semibold text-emerald-700">
-            ✅ 받을 수 있을 것으로 보이는 항목
+            ✅ 받을 수 있을 것으로 보이는 항목 ({eligible.length}건)
           </h2>
           <div className="space-y-4">
-            {eligible.map((r) => (
+            {eligibleShown.map((r) => (
               <ResultCard key={r.benefit.id} result={r} />
             ))}
           </div>
+          {eligible.length > CAP && (
+            <p className="mt-3 text-center text-sm text-zinc-400">
+              상위 {CAP}건만 표시 중 · 외 {eligible.length - CAP}건 더 있음 (조건을 더 입력하면 좁혀집니다)
+            </p>
+          )}
         </section>
       )}
 
       {review.length > 0 && (
         <section>
           <h2 className="mb-3 text-base font-semibold text-amber-700">
-            ⚠️ 조건 확인이 필요한 항목 (정보가 더 있으면 정확해져요)
+            ⚠️ 조건 확인이 필요한 항목 ({review.length}건)
           </h2>
           <div className="space-y-4">
-            {review.map((r) => (
+            {reviewShown.map((r) => (
               <ResultCard key={r.benefit.id} result={r} />
             ))}
           </div>
+          {review.length > CAP && (
+            <p className="mt-3 text-center text-sm text-zinc-400">
+              상위 {CAP}건만 표시 중 · 외 {review.length - CAP}건
+            </p>
+          )}
         </section>
       )}
     </main>

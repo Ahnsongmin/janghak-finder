@@ -95,6 +95,7 @@ function normalize(raw: RawPolicy, fetchedAt: string): Benefit {
     eduStatus: [], // 학력요건 코드 매핑은 실제 코드표 확인 후 추가 (현재는 무관 처리)
     grades: [],
     requiredFlags: [],
+    targetGroups: [],
     applyPeriod: raw.aplyYmd?.trim() || undefined,
     applyMethod: raw.plcyAplyMthdCn?.trim() || undefined,
     submitDocs: raw.sbmsnDcmntCn?.trim() || undefined,

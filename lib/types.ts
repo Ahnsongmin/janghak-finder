@@ -28,8 +28,11 @@ export interface Benefit {
   eduStatus: string[];
   /** 해당 학년. 빈 배열이면 무관/미상 */
   grades: number[];
-  /** 요구되는 특수자격(있으면 해당자만 대상). 빈 배열이면 무관 */
+  /** 요구되는 특수자격(모두 충족해야 함, AND). 빈 배열이면 무관 */
   requiredFlags: string[];
+  /** 대상 집단(이 중 하나라도 해당하면 대상, OR). 빈 배열이면 무관.
+   *  복지로 '대상특성'(장애인/한부모/다자녀 등)처럼 "여러 대상군 중 하나" 조건에 사용 */
+  targetGroups: string[];
 
   // ── 표시/근거용 (매칭엔 안 쓰지만 사용자 검증에 필수) ──
   amount?: string;

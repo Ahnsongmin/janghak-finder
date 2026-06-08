@@ -63,6 +63,14 @@ function checkFlags(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
     : { v: "fail", msg: `특수자격 필요: ${missing.join(", ")}` };
 }
 
+function checkTargetGroups(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
+  const groups = b.targetGroups ?? [];
+  if (groups.length === 0) return { v: "pass", msg: "대상 집단 무관" };
+  return u.flags.some((f) => groups.includes(f))
+    ? { v: "pass", msg: `대상 집단 해당(${groups.join("/")})` }
+    : { v: "fail", msg: `특정 대상 전용 (대상: ${groups.join("/")})` };
+}
+
 export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
   const checks = [
     checkRegion(benefit, user),
@@ -71,6 +79,7 @@ export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
     checkEdu(benefit, user),
     checkGrade(benefit, user),
     checkFlags(benefit, user),
+    checkTargetGroups(benefit, user),
   ];
 
   const passed = checks.filter((c) => c.v === "pass").map((c) => c.msg);

@@ -19,13 +19,20 @@ if (!key) {
   process.exit(1);
 }
 
-const url = new URL("https://www.youthcenter.go.kr/go/ythip/getPlcy");
-url.searchParams.set("apiKeyNm", key);
-url.searchParams.set("rtnType", "json");
-url.searchParams.set("pageNum", "1");
-url.searchParams.set("pageSize", "1");
+async function main() {
+  const url = new URL("https://www.youthcenter.go.kr/go/ythip/getPlcy");
+  url.searchParams.set("apiKeyNm", key!);
+  url.searchParams.set("rtnType", "json");
+  url.searchParams.set("pageNum", "1");
+  url.searchParams.set("pageSize", "1");
 
-const res = await fetch(url, { headers: { Accept: "application/json" } });
-console.log("HTTP", res.status);
-const data = await res.json();
-console.dir(data, { depth: 6 });
+  const res = await fetch(url, { headers: { Accept: "application/json" } });
+  console.log("HTTP", res.status);
+  const data = await res.json();
+  console.dir(data, { depth: 6 });
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

@@ -6,6 +6,7 @@
 import { writeFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fetchYouthCenter } from "../lib/sources/youthcenter";
+import { fetchBokjiro } from "../lib/sources/bokjiro";
 import type { Benefit } from "../lib/types";
 
 function loadEnv() {
@@ -26,18 +27,40 @@ async function main() {
   const collected: Benefit[] = [];
   const sources: string[] = [];
 
+  // 출처별로 독립 실행: 한 곳이 실패해도(키 미활성 등) 나머지는 수집되도록 try/catch.
   const youthKey = process.env.YOUTHCENTER_API_KEY;
   if (youthKey) {
-    console.log("[온통청년] 수집 시작…");
-    const policies = await fetchYouthCenter(youthKey);
-    collected.push(...policies);
-    sources.push(`온통청년 ${policies.length}건`);
-    console.log(`[온통청년] ${policies.length}건 수집`);
+    try {
+      console.log("[온통청년] 수집 시작…");
+      const policies = await fetchYouthCenter(youthKey);
+      collected.push(...policies);
+      sources.push(`온통청년 ${policies.length}건`);
+      console.log(`[온통청년] ${policies.length}건 수집`);
+    } catch (e) {
+      console.error("[온통청년] 실패:", (e as Error).message);
+    }
   } else {
-    console.warn("⚠️  YOUTHCENTER_API_KEY 없음 → 온통청년 수집 건너뜀");
+    console.warn("⚠️  YOUTHCENTER_API_KEY 없음 → 온통청년 건너뜀");
   }
 
-  // TODO(후속): 복지로/보조금24, 대학알리미, 한국장학재단 어댑터 추가
+  const dataKey = process.env.DATA_GO_KR_SERVICE_KEY;
+  if (dataKey) {
+    for (const kind of ["central", "local"] as const) {
+      try {
+        console.log(`[복지로:${kind}] 수집 시작…`);
+        const items = await fetchBokjiro(dataKey, kind);
+        collected.push(...items);
+        sources.push(`복지로(${kind}) ${items.length}건`);
+        console.log(`[복지로:${kind}] ${items.length}건 수집`);
+      } catch (e) {
+        console.error(`[복지로:${kind}] 실패:`, (e as Error).message);
+      }
+    }
+  } else {
+    console.warn("⚠️  DATA_GO_KR_SERVICE_KEY 없음 → 복지로 건너뜀");
+  }
+
+  // TODO(후속): 대학알리미(전국 대학+교내장학), 한국장학재단
 
   if (collected.length === 0) {
     console.warn("수집된 실데이터가 없습니다. 예시(demo) 데이터를 유지합니다.");
