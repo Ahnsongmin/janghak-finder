@@ -1,4 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "tsx scripts/ingest.ts || true && next build"
+  "buildCommand": "tsx scripts/ingest.ts || true && next build",
+  "crons": [
+    {
+      "path": "/api/cron-refresh",
+      "schedule": "0 21 * * *"
+    }
+  ]
 }
