@@ -6,6 +6,7 @@
 #   - 여성 전용(명시)   → genderOnly = "여성"
 #   - 단일 특정대학     → university = 추출 토큰 (학교 1곳 + 소속어, 일반어/다중나열 제외)
 #   - 보훈/유공자 후손  → targetGroups += ["국가보훈대상자"] (저소득 OR 동반 시 수급/차상위도 함께 = 누락 방지)
+#   - 이주배경 전용     → targetGroups += ["다문화가족"/"북한이탈주민"] (보훈과 동일 multi-OR 보존)
 #   - 문중/종친         → targetGroups += ["특정 문중·종친회"] (일반 사용자 해당 없음 → 노이즈 제거)
 # 이미 생성된 JSON을 직접 보정한다(원본 CSV는 빌드 입력이라 로컬에 없음). --apply 없으면 드라이런.
 import json, re, sys, io
@@ -18,6 +19,11 @@ MIL = re.compile(r"현역\s*군인|직업\s*군인|군무원|부사관|장교|�
 FEMALE = re.compile(r"여학생|여성만|여자\s*대학생|여자\s*대학원생|여대생")
 CLAN = re.compile(r"문중|종친|종회")
 BOHUN = re.compile(r"독립유공자|국가유공자|참전유공자|참전용사|보훈|유공자")
+# 이주배경(다문화·북한이탈) 전용 신호. GROUP_MAP에 동일 키워드가 있어 multi-OR 보존이 자동 적용된다.
+MIGRANT = re.compile(r"다문화|북한이탈|새터민|탈북")
+# '다문화/탈북 우대·가점'처럼 비배타적 가점 표현은 전용이 아니다(일반 대상 + 우대) → 트리거에서 제외.
+# 우대 절만 제거한 뒤에도 이주배경 키워드가 남아야 '전용'으로 본다(예: 새터민 대상 + 공대 우대는 유지).
+MIG_PREF = re.compile(r"(?:다문화|북한이탈|새터민|탈북)[^\n]{0,8}(?:우대|가점|가산|우선)")
 # 사회배려 대상 키워드 → 입력폼 특수자격(lib/options.ts SPECIAL_FLAGS)과 동일 라벨.
 # 보훈류 자격에 여러 대상이 OR로 나열될 때, 언급된 그룹 전체를 함께 태깅해 누락을 막는다.
 GROUP_MAP = [
@@ -47,7 +53,7 @@ def seg(raw, tag):
 
 def main():
     d = json.load(open(PATH, encoding="utf-8"))
-    stats = {"군자녀": 0, "여성": 0, "단일대학": 0, "보훈": 0, "문중": 0}
+    stats = {"군자녀": 0, "여성": 0, "단일대학": 0, "보훈": 0, "이주배경": 0, "문중": 0}
     samples = {k: [] for k in stats}
 
     def note(k, *vals):
@@ -78,10 +84,11 @@ def main():
                 if not DRY:
                     b["university"] = toks[0]
 
-        if not b.get("targetGroups") and BOHUN.search(jg):
-            # 보훈류 자격: 언급된 사회배려 그룹 전체를 OR로 태깅(누락 방지).
+        mig_core = MIG_PREF.sub("", jg)  # '~우대' 가점 절 제거 후 남은 본문으로 전용 여부 판단
+        if not b.get("targetGroups") and (BOHUN.search(jg) or MIGRANT.search(mig_core)):
+            # 보훈/이주배경 자격: 언급된 사회배려 그룹 전체를 OR로 태깅(누락 방지).
             groups = [name for name, rx in GROUP_MAP if rx.search(jg)]
-            note("보훈", b["name"][:24], "+".join(groups), jg[:42])
+            note("보훈" if BOHUN.search(jg) else "이주배경", b["name"][:24], "+".join(groups), jg[:42])
             if not DRY:
                 b["targetGroups"] = groups
 

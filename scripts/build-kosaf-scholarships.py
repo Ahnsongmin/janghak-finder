@@ -120,6 +120,10 @@ _MIL = re.compile(r"현역\s*군인|직업\s*군인|군무원|부사관|장교|�
 _FEMALE = re.compile(r"여학생|여성만|여자\s*대학생|여자\s*대학원생|여대생")
 _CLAN = re.compile(r"문중|종친|종회")
 _BOHUN = re.compile(r"독립유공자|국가유공자|참전유공자|참전용사|보훈|유공자")
+# 이주배경(다문화·북한이탈) 전용. _GROUP_MAP에 동일 키워드가 있어 multi-OR 보존이 자동 적용된다.
+_MIGRANT = re.compile(r"다문화|북한이탈|새터민|탈북")
+# '다문화/탈북 우대·가점'은 비배타적 가점(일반 대상)이라 전용이 아니다 → 우대 절 제거 후 판단.
+_MIG_PREF = re.compile(r"(?:다문화|북한이탈|새터민|탈북)[^\n]{0,8}(?:우대|가점|가산|우선)")
 _GROUP_MAP = [
     ("국가보훈대상자", _BOHUN),
     ("기초생활수급자", re.compile(r"기초생활수급|기초수급|수급자|수급권자")),
@@ -154,7 +158,8 @@ def extract_eligibility(special: str):
         multi = bool(_MULTI.search(jg) and len(re.findall(r"대학교|대학|여대", jg)) >= 2)
         if len(toks) == 1 and not multi:
             out["university"] = toks[0]
-    if _BOHUN.search(jg):
+    if _BOHUN.search(jg) or _MIGRANT.search(_MIG_PREF.sub("", jg)):
+        # 보훈/이주배경 전용: 언급된 사회배려 그룹 전체를 OR로 태깅(누락 방지).
         out["targetGroups"] = [name for name, rx in _GROUP_MAP if rx.search(jg)]
     elif _CLAN.search(jg):
         out["targetGroups"] = ["특정 문중·종친회"]

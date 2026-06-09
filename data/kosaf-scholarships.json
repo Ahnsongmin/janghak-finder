@@ -62,7 +62,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "장애인(본인/가족)",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "1인당 100만원 생활비 지원 장학금으로 타 장학금 중복여부와 상관없이 신청 가능",
@@ -251,7 +254,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "500만원(2회 분할 지급)",
@@ -275,7 +280,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "500만원",
@@ -1048,7 +1055,12 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "기초생활수급자",
+      "차상위계층",
+      "한부모가족",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만원 4년간 균등분할 지급",
@@ -1902,7 +1914,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "250만원",
@@ -2062,7 +2076,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "200만원 분할지급",
@@ -2694,7 +2710,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "200만원",
@@ -3258,7 +3276,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "200만원",
@@ -3304,7 +3324,14 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "기초생활수급자",
+      "차상위계층",
+      "한부모가족",
+      "장애인(본인/가족)",
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "300만원",
@@ -3990,7 +4017,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [
       "사회계열",
@@ -4764,7 +4793,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "50만원",
@@ -7887,7 +7918,11 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "한부모가족",
+      "장애인(본인/가족)",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "최대 200만원(타 장학금 수령액 공제)",
@@ -7959,7 +7994,11 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "한부모가족",
+      "장애인(본인/가족)",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "최대 200만원 (타 장학금 수령액 공제)",
@@ -8676,7 +8715,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만원※ 등록금 범위 내 지급기준",
@@ -9847,7 +9889,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "200만원(생활비 장학금)",
@@ -9893,7 +9937,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "180만원",
@@ -10749,7 +10796,11 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "기초생활수급자",
+      "차상위계층",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "200만원",
@@ -11929,7 +11980,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "장애인(본인/가족)",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "250만원 이내※ 중복지원 방지를 위해 등록금 범위 내 타 지급된 장학금이 있을 경우 잔여 등록금만 지원",
@@ -12845,7 +12899,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "200만원",
@@ -13008,7 +13065,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "※ 자세한 사항은 첨부파일 또는 홈페이지 참고",
@@ -13835,7 +13894,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "1학년 1학기 1회 지급 최대 200만원",
@@ -14971,7 +15032,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "200만원 (상/하반기 분할 지급)",
@@ -15273,7 +15336,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만원",
@@ -15784,7 +15849,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "150만원",
@@ -17820,7 +17887,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "150만원",
@@ -19579,7 +19648,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "학기 당 300만원 생활비 (연 600만원)",
@@ -20142,7 +20213,13 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "기초생활수급자",
+      "차상위계층",
+      "한부모가족",
+      "장애인(본인/가족)",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "150만원",
@@ -20165,7 +20242,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "300만원※ 학업장려금(생활비 재능개발비 등 등록금 이외의 교육비)으로 이중수혜 가능※ 자세한 사항은 첨부파일 또는 홈페이지 참고",
@@ -21369,7 +21448,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "대학생 장학금 : 300만원 한도 치료비 : 2000만원 생계비 : 200만원",
@@ -22508,7 +22589,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "매 학기 150만원의 학업장려금이 졸업시 까지 지원※ 이중수혜 가능",
@@ -22555,7 +22638,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "150만원 (학업장려금 지원)",
@@ -22964,7 +23049,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "400만원",
@@ -23790,7 +23877,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "장애인(본인/가족)",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만원",
@@ -25505,7 +25595,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "전문대학: 150만원 종합대학: 200만원",
@@ -26088,7 +26181,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "연간 500만원(한 학기 250만원)",
@@ -27330,7 +27426,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만원(생활비성 장학금)",
@@ -27587,7 +27685,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "400만원",
@@ -28350,7 +28450,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만원",
@@ -29012,7 +29115,11 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "한부모가족",
+      "장애인(본인/가족)",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "학기당 1인 최대 200만원",
@@ -30384,7 +30491,11 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "장애인(본인/가족)",
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "종합대학: 200만원 전문대학: 150만원",
@@ -30523,7 +30634,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만만원",
@@ -30547,7 +30660,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만만원",
@@ -31551,7 +31666,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "200만원",
@@ -31976,7 +32093,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [
       "공학계열",
@@ -32144,7 +32263,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "생활비 월 40만원/12개월 지원",
@@ -32169,7 +32290,9 @@
     "requiredFlags": [
       "군인 자녀(군자녀)"
     ],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "인당 500만원",
@@ -32193,7 +32316,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "최대 200만원 한도 내 학비 지원(1회)",
@@ -32758,7 +32883,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "학기당 300만원 (월 50만원) 도서구입비 매월 2만원/보조학습지원/캠프/멘토링/상담 등",
@@ -33073,7 +33200,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "국·공립대학 등 : 등록금 100% 면제 사립대학 등 : 등록금 50% 보조※ 최초 입학한 날로부터 6년 범위 내에서 최대 8학기 지원",
@@ -33283,7 +33412,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "기초생활수급자",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만원",
@@ -33713,7 +33845,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "200만원(생활비)※ 학교별 상이할 수 있음※ 기관확인필요",
@@ -33908,7 +34042,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만원",
@@ -34234,7 +34371,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "학기당 300만원(연 600만원)",
@@ -35379,7 +35518,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "1인 100만원",
@@ -36666,7 +36807,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "한부모가족",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "등록금 전액 (등록금/수업료/학생회비/졸업비 등 학교에 납부하는 총금액)",
@@ -37138,7 +37282,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "※ 기관확인필요",
@@ -37255,7 +37401,14 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "기초생활수급자",
+      "차상위계층",
+      "한부모가족",
+      "장애인(본인/가족)",
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "250만원",
@@ -38957,7 +39110,11 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "장애인(본인/가족)",
+      "다문화가족",
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "매월 20만원 (1년 총 240만원)",
@@ -39291,7 +39448,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "100만원 (1회 지급7월 중 지급 예정)",
@@ -40017,7 +40176,10 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "장애인(본인/가족)",
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "1인당 최대 300만원 (년 2회 분할지급)",
@@ -40160,7 +40322,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "50만원",
@@ -40556,7 +40720,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "국내대학·대학교 : 100만원 해외 대학·대학교 : 150만원 대학원(석사과정까지) : 150만원 등록금에 한해 위의 금액을 한도로 지원하므로 타 장학금 수혜자의 경우 잔여 등록금액을 확인하여 지원 바람 선발 장학생은 최초 선발시 재학중인 학위과정을 졸업할 때까지 장학금 지원",
@@ -40742,7 +40908,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "연간 360만원",
@@ -41234,7 +41402,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "북한이탈주민"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "월60만원(입학 예정 기준 최대 8학기)",
@@ -41942,7 +42112,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "400만원",
@@ -42867,7 +43039,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "300만원",
@@ -42891,7 +43065,9 @@
     ],
     "grades": [],
     "requiredFlags": [],
-    "targetGroups": [],
+    "targetGroups": [
+      "다문화가족"
+    ],
     "departments": [],
     "faculties": [],
     "amount": "500만원",
