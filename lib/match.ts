@@ -157,7 +157,8 @@ function checkTargetGroups(b: Benefit, u: UserProfile): { v: Verdict; msg: strin
 
 /** 대학명 느슨한 일치 (예: "서강대" ↔ "서강대학교") */
 function univMatches(selected: string, target: string): boolean {
-  const norm = (s: string) => s.replace(/대학교|대학|\s|\(.*?\)/g, "");
+  // 약칭↔정식 정규화: "이화여대"↔"이화여자대학교", "서강대학교"↔"서강대학" 등. 긴 어미부터 제거.
+  const norm = (s: string) => s.replace(/여자대학교|여자대학|여대|대학교|대학|\s|\(.*?\)/g, "");
   const a = norm(selected);
   const b = norm(target);
   return !!a && !!b && (a === b || a.includes(b) || b.includes(a));

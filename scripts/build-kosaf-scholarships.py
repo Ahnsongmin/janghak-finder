@@ -113,6 +113,54 @@ def display_name(org: str, product_name: str) -> str:
         return f"{org} 장학금" if "장학" not in org else f"{org} ({nm})"
     return nm
 
+# ── 특정자격(특정자격 상세내용=[자격]) → 구조화 하드 제약 ──────────────
+# 오탐(정당한 장학금 숨김) 방지를 위해 신뢰도 높은 신호만. lib/match.ts·options.ts와 호응.
+# (scripts/structure-kosaf-eligibility.py 와 동일 규칙 — JSON 직접보정용 보조 스크립트와 일치)
+_MIL = re.compile(r"현역\s*군인|직업\s*군인|군무원|부사관|장교|군인")
+_FEMALE = re.compile(r"여학생|여성만|여자\s*대학생|여자\s*대학원생|여대생")
+_CLAN = re.compile(r"문중|종친|종회")
+_BOHUN = re.compile(r"독립유공자|국가유공자|참전유공자|참전용사|보훈|유공자")
+_GROUP_MAP = [
+    ("국가보훈대상자", _BOHUN),
+    ("기초생활수급자", re.compile(r"기초생활수급|기초수급|수급자|수급권자")),
+    ("차상위계층", re.compile(r"차상위")),
+    ("한부모가족", re.compile(r"한부모|조손|소년소녀")),
+    ("장애인(본인/가족)", re.compile(r"장애인|장애")),
+    ("다문화가족", re.compile(r"다문화")),
+    ("북한이탈주민", re.compile(r"북한이탈|새터민|탈북")),
+]
+_UNIV_TOKEN = re.compile(
+    r"([가-힣]{2,7}(?:여자대학교|여자대학|여대|대학교|대학))"
+    r"(?=\s*(?:재학생|재학|학부|졸업생|졸업|소속|출신|동문|총동문회))"
+)
+_GENERIC_TOK = ("정규대학", "원격대학", "사이버대학", "방송통신대학", "일반대학", "야간대학",
+                "외국대학", "국내대학", "해당대학", "소재대학", "전문대학", "정규대학교", "4년제",
+                "우수대학", "명문대학", "관내대학", "지역대학", "도내대학", "지방대학", "거점대학")
+_MULTI = re.compile(r"[/·]|및|,")
+
+
+def extract_eligibility(special: str):
+    """특정자격(=[자격]) 텍스트에서 university / genderOnly / requiredFlags / targetGroups 추론."""
+    jg = special or ""
+    out = {}
+    if not jg.strip():
+        return out
+    if _MIL.search(jg) and "자녀" in jg:
+        out["requiredFlags"] = ["군인 자녀(군자녀)"]
+    if _FEMALE.search(jg):
+        out["genderOnly"] = "여성"
+    if not any(g in jg for g in _GENERIC_TOK):
+        toks = [t for t in dict.fromkeys(_UNIV_TOKEN.findall(jg)) if not any(g in t for g in _GENERIC_TOK)]
+        multi = bool(_MULTI.search(jg) and len(re.findall(r"대학교|대학|여대", jg)) >= 2)
+        if len(toks) == 1 and not multi:
+            out["university"] = toks[0]
+    if _BOHUN.search(jg):
+        out["targetGroups"] = [name for name, rx in _GROUP_MAP if rx.search(jg)]
+    elif _CLAN.search(jg):
+        out["targetGroups"] = ["특정 문중·종친회"]
+    return out
+
+
 def build():
     with open(SRC, encoding="cp949") as f:
         rows = list(csv.DictReader(f))
@@ -147,6 +195,7 @@ def build():
         is_regional = (r.get("학자금유형구분") or "").strip() == "지역연고"
         regions = extract_regions(org, region_detail, special, is_regional)
         faculties = extract_faculties(r.get("학과구분", ""))
+        elig = extract_eligibility(special)  # 군자녀·여성·특정대학·보훈/문중 하드제약
 
         # 소득 note: 심사형이면 means-test 신호 포함 (match.ts MEANS_TESTED와 호응)
         income_note = None
@@ -192,10 +241,12 @@ def build():
             "ageMax": None,
             "eduStatus": ["대학생(재학)"],
             "grades": [],
-            "requiredFlags": [],
-            "targetGroups": [],
+            "requiredFlags": elig.get("requiredFlags", []),
+            "targetGroups": elig.get("targetGroups", []),
             "departments": [],
             "faculties": faculties,
+            "university": elig.get("university"),
+            "genderOnly": elig.get("genderOnly"),
             "amount": support[:200] if support else None,
             "applyPeriod": apply_period,
             "applyUrl": homepage or "https://www.kosaf.go.kr",
