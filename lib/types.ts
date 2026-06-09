@@ -24,6 +24,11 @@ export interface Benefit {
   incomeNote?: string;
   ageMin: number | null;
   ageMax: number | null;
+  /** 요구 최소 평점(원문에 적힌 그대로의 값). null = 성적 무관/미상.
+   *  백분위(100점) 기준 요건은 평점과 직접 환산이 부정확해 여기 두지 않고 rawConditionText로만 안내한다. */
+  gpaMin?: number | null;
+  /** gpaMin의 만점 기준(예: 4.5, 4.3). 사용자 평점과 만점이 달라도 비율로 정확히 비교한다. */
+  gpaScale?: number;
   /** 학력/재학상태 요건. 빈 배열이면 무관/미상 */
   eduStatus: string[];
   /** 해당 학년. 빈 배열이면 무관/미상 */
@@ -39,6 +44,13 @@ export interface Benefit {
   /** 특정 학과/전공 전용이면 해당 학과명 키워드 배열(예: ["전자공학", "인공지능"]).
    *  설정 시, 사용자가 그 학과를 입력했을 때만 노출. 빈 배열/미설정이면 학과 무관 */
   departments?: string[];
+  /** 특정 계열 전용이면 계열명 배열(예: ["공학계열", "자연계열"]=이공계).
+   *  학과보다 한 단계 넓은 매칭. 사용자 계열(선택 또는 학과에서 추론)과 비교.
+   *  빈 배열/미설정이면 계열 무관. lib/faculty.ts FACULTIES 값과 일치시킨다 */
+  faculties?: string[];
+  /** 성별 전용이면 "여성" 또는 "남성". 미설정이면 성별 무관.
+   *  설정 시 다른 성별 사용자에겐 제외, 성별 미입력 사용자에겐 표시(누락 방지) */
+  genderOnly?: "여성" | "남성";
 
   // ── 표시/근거용 (매칭엔 안 쓰지만 사용자 검증에 필수) ──
   amount?: string;
@@ -66,8 +78,16 @@ export interface UserProfile {
   eduStatus: string;
   /** 학년 1~4(+). 0 = 모름/미선택 */
   grade: number;
+  /** 평점평균(사용자가 입력한 값). undefined = 미입력 */
+  gpa?: number;
+  /** 사용자 평점의 만점 기준(4.5/4.3/4.0). 기본 4.5 */
+  gpaScale?: number;
   /** 선택한 대학명. "" 이면 미선택 */
   univ: string;
+  /** 선택한 계열(공학계열/인문계열 등). "" 이면 미선택 — 비면 major에서 추론 */
+  faculty: string;
+  /** 성별("여성"/"남성"). "" 이면 미선택 — 성별 전용 장학금 매칭에만 사용 */
+  gender: string;
   /** 입력한 학과/전공. "" 이면 미입력 */
   major: string;
   /** 보유 특수자격 플래그 */

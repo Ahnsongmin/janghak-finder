@@ -2,5 +2,14 @@
   {
     "university": "서강대학교",
     "urls": ["https://www.sogang.ac.kr/bachelor/students/sch/sch01.html"]
+  },
+  {
+    "university": "고려대학교",
+    "urls": [
+      "https://scholarship.korea.ac.kr/scholarship/item01_02.do",
+      "https://scholarship.korea.ac.kr/scholarship/item02_03.do",
+      "https://scholarship.korea.ac.kr/scholarship/item04_01.do",
+      "https://scholarship.korea.ac.kr/scholarship/item03_01.do"
+    ]
   }
 ]

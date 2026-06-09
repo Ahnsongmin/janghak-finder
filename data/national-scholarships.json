@@ -1,0 +1,199 @@
+[
+  {
+    "id": "nat:kosaf:type1",
+    "name": "국가장학금 Ⅰ유형 (학생직접지원형)",
+    "category": "장학금",
+    "provider": "한국장학재단",
+    "sourceName": "한국장학재단",
+    "description": "소득연계형 국가장학금. 학자금 지원 9구간 이하 대학생에게 소득구간별로 등록금을 차등 지원.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": 9,
+    "incomeNote": "학자금 지원구간 9구간 이하(소득 심사)",
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)",
+      "신입생/예비대학생"
+    ],
+    "grades": [],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "amount": "연 지원(2026): 기초·차상위 전액 / 1~3구간 600만 / 4~6구간 440만 / 7~8구간 360만 / 9구간 100만원",
+    "applyUrl": "https://www.kosaf.go.kr",
+    "rawConditionText": "[소득] 학자금 지원 9구간 이하. [성적] 직전학기 12학점 이상 이수 + 100점 만점 80점(B0) 이상(기초·차상위는 성적기준 일부 완화). [지원기간] 정규 학기(4년제 최대 8학기) 한도. 신청·일정은 한국장학재단(www.kosaf.go.kr / 1599-2000) 확인.",
+    "lastFetchedAt": "2026-06-09"
+  },
+  {
+    "id": "nat:kosaf:type2",
+    "name": "국가장학금 Ⅱ유형 (대학연계지원형)",
+    "category": "장학금",
+    "provider": "한국장학재단",
+    "sourceName": "한국장학재단",
+    "description": "대학이 자체 기준으로 선발해 추가 지원하는 국가장학금. 대학별 선정기준·금액이 다름.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": 9,
+    "incomeNote": "9구간 이하 + 대학별 자체 기준(소득·성적) 상이",
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)",
+      "신입생/예비대학생"
+    ],
+    "grades": [],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "amount": "대학별 상이(대학 자체 기준)",
+    "applyUrl": "https://www.kosaf.go.kr",
+    "rawConditionText": "[소득] 통상 9구간 이하. [선발] 각 대학이 자체 기준으로 선정(소득·성적·기타 요건 대학별 상이). 자세한 기준은 재학 대학 장학팀 및 한국장학재단 확인.",
+    "lastFetchedAt": "2026-06-09"
+  },
+  {
+    "id": "nat:kosaf:multichild",
+    "name": "다자녀 국가장학금",
+    "category": "장학금",
+    "provider": "한국장학재단",
+    "sourceName": "한국장학재단",
+    "description": "자녀 3명 이상 다자녀가구 대학생 대상 국가장학금. 셋째 이상 자녀는 등록금 전액(8구간 이하) 지원.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": 9,
+    "incomeNote": "9구간 이하 + 다자녀가구(자녀 3명 이상)",
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)",
+      "신입생/예비대학생"
+    ],
+    "grades": [],
+    "requiredFlags": [
+      "다자녀가구(3자녀 이상)"
+    ],
+    "targetGroups": [],
+    "departments": [],
+    "amount": "첫째·둘째: 1~3구간 610만 / 4~6구간 505만 / 7~8구간 465만 / 9구간 135만. 셋째 이상: 1~8구간 등록금 전액 / 9구간 200만원",
+    "rawConditionText": "[대상] 학자금 지원 9구간 이하, 자녀 3명 이상 다자녀가구의 미혼 대학생. ('23-2학기 이후 입학자는 입학 당시 만 39세 이하 요건.) [성적] 국가장학금 성적기준 충족.",
+    "applyUrl": "https://www.kosaf.go.kr",
+    "lastFetchedAt": "2026-06-09"
+  },
+  {
+    "id": "nat:kosaf:work",
+    "name": "국가근로장학금",
+    "category": "장학금",
+    "provider": "한국장학재단",
+    "sourceName": "한국장학재단",
+    "description": "교내·교외(국가기관·공공기관 등) 근로지에서 일하고 근로시간만큼 장학금을 받는 제도.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": 9,
+    "incomeNote": "학자금 지원구간 9구간 이하(소득 심사)",
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)",
+      "신입생/예비대학생"
+    ],
+    "grades": [],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "amount": "시급(2026): 교내 10,320원 / 교외 12,790원 (근로시간 비례)",
+    "applyUrl": "https://www.kosaf.go.kr",
+    "rawConditionText": "[소득] 학자금 지원 9구간 이하. [성적] 직전학기 100점 만점 70점(C0 수준) 이상. [근로] 학기 중·방학 중 배정 근로지에서 근로. 모집·배정은 재학 대학 및 한국장학재단 공고 확인.",
+    "lastFetchedAt": "2026-06-09"
+  },
+  {
+    "id": "nat:kosaf:bluelight",
+    "name": "푸른등대 기부장학금",
+    "category": "장학금",
+    "provider": "한국장학재단",
+    "sourceName": "한국장학재단",
+    "description": "기업·개인 기부금으로 운영되는 국가장학금. 소득·성적 심사에 기부처별 지정요건(전공·지역·특기 등)이 추가됨.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": 9,
+    "incomeNote": "소득·성적 심사 + 기부처별 추가 요건(소득 심사)",
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)",
+      "신입생/예비대학생"
+    ],
+    "grades": [],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "amount": "기부처별 상이(등록금·생활비 등)",
+    "applyUrl": "https://www.kosaf.go.kr",
+    "rawConditionText": "[심사] 국가장학금(Ⅰ·Ⅱ유형, 다자녀, 지방인재)과 동일하게 소득분위·성적 반영 + 기부처가 정한 추가 자격(전공·출신지역·특기 등). 사업별 모집공고를 한국장학재단에서 확인.",
+    "lastFetchedAt": "2026-06-09"
+  },
+  {
+    "id": "nat:kosaf:president-science",
+    "name": "대통령과학장학금",
+    "category": "장학금",
+    "provider": "한국장학재단",
+    "sourceName": "한국장학재단",
+    "description": "자연과학·공학계열(이공계) 최우수 학생 대상 국가 장학. 등록금 전액 + 학업장려비 지원.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": null,
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)",
+      "신입생/예비대학생"
+    ],
+    "grades": [],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "faculties": [
+      "공학계열",
+      "자연계열"
+    ],
+    "amount": "정규학기 등록금 전액 + 학업장려비 250만원/학기 (기초생활수급자는 생활비 250만원/학기 추가)",
+    "applyUrl": "https://www.kosaf.go.kr",
+    "rawConditionText": "[대상] 자연과학·공학계열 학과(부) 재학 신입생 및 3학년(신규 선발 기준). 성적 최우수자. 소득 무관(성적 중심). 신규선발 공고·일정은 한국장학재단(1599-2290) 확인.",
+    "lastFetchedAt": "2026-06-09"
+  },
+  {
+    "id": "nat:kosaf:science-excellence",
+    "name": "국가우수장학금(이공계)",
+    "category": "장학금",
+    "provider": "한국장학재단",
+    "sourceName": "한국장학재단",
+    "description": "국내 4년제 자연과학·공학계열(이공계) 우수 학생 대상 국가 장학. 등록금 + 학업장려비 지원.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": null,
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)",
+      "신입생/예비대학생"
+    ],
+    "grades": [],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "faculties": [
+      "공학계열",
+      "자연계열"
+    ],
+    "amount": "등록금 전액 + 학업장려비(월 일정액)",
+    "applyUrl": "https://www.kosaf.go.kr",
+    "rawConditionText": "[대상] 국내 4년제 대학 자연과학·공학계열 학과(부) 재학생. 신규 선발은 1학년 또는 3학년 기준, 성적 우수. 소득 무관(성적 중심). 정확한 금액·선발기준은 한국장학재단 공고 확인.",
+    "lastFetchedAt": "2026-06-09"
+  }
+]

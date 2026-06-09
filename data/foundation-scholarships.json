@@ -1,0 +1,141 @@
+[
+  {
+    "id": "fnd:ikef:undergrad",
+    "name": "관정 이종환 교육재단 학부장학금",
+    "category": "장학금",
+    "provider": "관정이종환교육재단",
+    "sourceName": "민간재단(관정이종환)",
+    "description": "국내 대표 민간 장학재단. 성적 최우수 학부생에게 등록금·생활비를 큰 규모로 지원(소득 무관, 성적 중심).",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": null,
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)"
+    ],
+    "grades": [],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "faculties": [],
+    "amount": "재단 선발계획에 따른 장학금(A·B형) — 등록금·생활비 등 (상세 금액은 매년 공고)",
+    "applyUrl": "https://www.ikef.or.kr",
+    "rawConditionText": "[대상] 재단 추천 대학 재학생 중 다음 학기에 5학기 진학예정자(주로 2→3학년), 전체 평점평균 3.8/4.3 이상. 성적·인성 최우수. [소득] 무관(성적 중심). [신청] 보통 매년 가을(학부 ~11월) 소속 대학 추천 + 재단 서류·면접. 공식: ikef.or.kr",
+    "lastFetchedAt": "2026-06-09",
+    "gpaMin": 3.8,
+    "gpaScale": 4.3
+  },
+  {
+    "id": "fnd:cmk:ondream",
+    "name": "현대차 정몽구 스칼러십 (온드림)",
+    "category": "장학금",
+    "provider": "현대차정몽구재단",
+    "sourceName": "민간재단(현대차정몽구)",
+    "description": "현대차정몽구재단의 대학생 장학. 중위소득 150% 이하 우수 학생에게 졸업까지 등록금 전액 + 학습지원비 지원.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": 7,
+    "incomeNote": "중위소득 150% 이하(학자금 7구간 이하 또는 기초·차상위·한부모 등 법정저소득층)",
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)"
+    ],
+    "grades": [],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "faculties": [],
+    "amount": "졸업 시까지 등록금 전액 + 학습지원비 학기당 180만원 (국제학술대회·해외진출 지원 등 추가)",
+    "applyUrl": "https://www.cmkfoundation-scholarship.org",
+    "rawConditionText": "[소득] 가구 중위소득 150% 이하 (① 법정저소득층(기초·차상위·한부모 등) ② 학자금 지원 7구간 이하 ③ 중위소득 150% 이하 중 1개 충족). [성적] 전 학기 백분위 90점 이상. [대상] 재단 지정 대학 2·3학년(미래산업 분야 중심). 타 기관 장학금 중복수혜 제한. 지정대학·분야는 공고 확인. 공식: cmkfoundation-scholarship.org",
+    "lastFetchedAt": "2026-06-09"
+  },
+  {
+    "id": "fnd:woonhae:science",
+    "name": "운해장학금 (운해장학재단)",
+    "category": "장학금",
+    "provider": "운해장학재단",
+    "sourceName": "민간재단(운해)",
+    "description": "이공계 학부생 대상 연 800만원 학업장려금 지원. 성적우수형(소득 무관)과 가계곤란형(3구간 이하) 두 유형. 대학 총장 추천 필수.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": null,
+    "incomeNote": "1유형(이공계 성적우수) 소득 무관 / 2유형 소득 3구간 이하 — 유형별 공고 확인",
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)"
+    ],
+    "grades": [1, 2, 3],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "faculties": [
+      "공학계열",
+      "자연계열"
+    ],
+    "gpaMin": 4.0,
+    "gpaScale": 4.5,
+    "amount": "연 800만원 (학기당 400만원, 학업장려금)",
+    "applyUrl": "https://www.woonhaefoundation.org",
+    "rawConditionText": "[대상] 이공계 전공 학부 1~3학년. [유형] 1유형: 자기 전문분야에서 탁월한 능력, 소득 무관 / 2유형: 학업성적 우수 + 가정형편 곤란(학자금 3구간 이하). [성적] 해당 학기 평점 평균 4.0/4.5 이상(재단 기준). [신청] 대학 총장 추천 필수, 매년 11~12월 공고 → 12월 우편 접수 → 1~2월 선발. 공식: woonhaefoundation.org",
+    "lastFetchedAt": "2026-06-09"
+  },
+  {
+    "id": "fnd:kochon:living",
+    "name": "종근당고촌재단 생활비 장학금",
+    "category": "장학금",
+    "provider": "종근당고촌재단",
+    "sourceName": "민간재단(종근당고촌)",
+    "description": "서울 소재 4년제 대학 2학년 이상 재학생 대상 월 50만원(연 600만원) 생활비 지원. 소득 2구간 이하 저소득 학생 대상, 최대 3년.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": 2,
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)"
+    ],
+    "grades": [2, 3, 4],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "faculties": [],
+    "amount": "월 50만원(연 600만원), 최대 3년",
+    "applyUrl": "http://www.kochon.org",
+    "rawConditionText": "[대상] 서울 소재 4년제 대학교 2학년 1학기 진학 예정자(약학과는 4학년, 5년제 건축은 3학년). [소득] 소득분위 2구간 이하. [기타] 주 1회 2시간 멘토링 봉사활동 필수 / 타 기관 생활비 미수혜자 / 서울 소재 대학 한정. [지원] 월 50만원(연 600만원), 최대 3년(정규학기). [신청] 12~1월, 재단 홈페이지 온라인 접수. 공식: kochon.org",
+    "lastFetchedAt": "2026-06-09"
+  },
+  {
+    "id": "fnd:kochon:dorm",
+    "name": "종근당고촌재단 무상기숙사 장학금",
+    "category": "장학금",
+    "provider": "종근당고촌재단",
+    "sourceName": "민간재단(종근당고촌)",
+    "description": "서울 소재 4년제 대학 재학생에게 서울 내 종근당고촌학사(4곳) 기숙사비·관리비·공과금 전액 무상 지원. 최대 3년.",
+    "regions": [
+      "전국"
+    ],
+    "incomeMax": null,
+    "ageMin": null,
+    "ageMax": null,
+    "eduStatus": [
+      "대학생(재학)"
+    ],
+    "grades": [2, 3, 4],
+    "requiredFlags": [],
+    "targetGroups": [],
+    "departments": [],
+    "faculties": [],
+    "amount": "기숙사비·관리비·공과금 전액 무상 (최대 3년)",
+    "applyUrl": "http://www.kochon.org",
+    "rawConditionText": "[대상] 서울 소재 4년제 대학 2학년 이상 재학생('26년 3월 기준). [혜택] 종근당고촌학사(서울 4곳) 입주, 기숙사비·관리비·공과금 전액 무상. [제한] 서울 소재 대학 한정(지방 출신 우선 선발). [기간] 최대 3년(정규학기). [신청] 12~1월, 재단 홈페이지 온라인 접수. 공식: kochon.org",
+    "lastFetchedAt": "2026-06-09"
+  }
+]

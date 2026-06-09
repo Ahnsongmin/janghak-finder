@@ -36,6 +36,11 @@ export function themeOf(b: Benefit): Theme {
 export function relevanceScore(r: MatchResult): number {
   const b = r.benefit;
   let s = 0;
+  // 학과 전용 장학금은 매칭을 통과해야만(=사용자 학과와 일치해야만) 결과에 남는다.
+  // 따라서 남아 있다는 건 곧 "내 전공 장학금"이라는 뜻 → 최상단으로.
+  if ((b.departments?.length ?? 0) > 0) s += 2000;
+  // 계열 전용(이공계 등)도 남아 있으면 내 계열 대상 → 학과 다음 우선순위.
+  if ((b.faculties?.length ?? 0) > 0) s += 1500;
   if (b.category === "장학금") s += 1000;
   if (b.sourceName.includes("청년") || /청년|대학생|학자금|장학|등록금/.test(b.name)) s += 500;
   if (r.status === "eligible") s += 100;

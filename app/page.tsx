@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SIDO, INCOME_OPTIONS, EDU_STATUS, GRADE_OPTIONS, SPECIAL_FLAGS } from "@/lib/options";
+import { FACULTIES } from "@/lib/faculty";
 import universities from "@/data/universities.json";
 
 const UNIV_NAMES = (universities as { name: string }[]).map((u) => u.name);
@@ -14,7 +15,11 @@ export default function Home() {
   const [age, setAge] = useState("");
   const [eduStatus, setEduStatus] = useState("");
   const [grade, setGrade] = useState(0);
+  const [gender, setGender] = useState("");
+  const [gpa, setGpa] = useState("");
+  const [gpaScale, setGpaScale] = useState("4.5");
   const [univ, setUniv] = useState("");
+  const [faculty, setFaculty] = useState("");
   const [major, setMajor] = useState("");
   const [flags, setFlags] = useState<string[]>([]);
 
@@ -29,7 +34,13 @@ export default function Home() {
     if (age) p.set("age", age);
     if (eduStatus) p.set("edu", eduStatus);
     if (grade) p.set("grade", String(grade));
+    if (gender) p.set("gender", gender);
+    if (gpa) {
+      p.set("gpa", gpa);
+      p.set("gpaScale", gpaScale);
+    }
     if (univ) p.set("univ", univ);
+    if (faculty) p.set("faculty", faculty);
     if (major) p.set("major", major);
     if (flags.length) p.set("flags", flags.join(","));
     router.push(`/results?${p.toString()}`);
@@ -120,6 +131,49 @@ export default function Home() {
 
         <div>
           <label className={labelCls}>
+            성별 <span className="font-normal text-zinc-400">(여성 전용 장학금 매칭용, 선택사항)</span>
+          </label>
+          <select className={fieldCls} value={gender} onChange={(e) => setGender(e.target.value)}>
+            <option value="">선택 안 함</option>
+            <option value="여성">여성</option>
+            <option value="남성">남성</option>
+          </select>
+        </div>
+
+        <div>
+          <label className={labelCls}>
+            평점평균 (학점) <span className="font-normal text-zinc-400">(선택사항)</span>
+          </label>
+          <div className="grid grid-cols-[1fr_auto] gap-3">
+            <input
+              type="number"
+              inputMode="decimal"
+              step="0.01"
+              min="0"
+              max="4.5"
+              className={fieldCls}
+              value={gpa}
+              onChange={(e) => setGpa(e.target.value)}
+              placeholder="예: 3.75"
+            />
+            <select
+              className={fieldCls + " w-auto"}
+              value={gpaScale}
+              onChange={(e) => setGpaScale(e.target.value)}
+              aria-label="만점 기준"
+            >
+              <option value="4.5">/ 4.5 만점</option>
+              <option value="4.3">/ 4.3 만점</option>
+              <option value="4.0">/ 4.0 만점</option>
+            </select>
+          </div>
+          <p className="mt-1 text-xs text-zinc-400">
+            본인 학교 만점 기준을 그대로 선택하세요. 만점이 달라도 정확히 비교합니다(환산 불필요).
+          </p>
+        </div>
+
+        <div>
+          <label className={labelCls}>
             대학교 <span className="font-normal text-zinc-400">(검색해서 선택, 선택사항)</span>
           </label>
           <input
@@ -139,6 +193,20 @@ export default function Home() {
 
         <div>
           <label className={labelCls}>
+            계열 <span className="font-normal text-zinc-400">(이공계 등 계열별 장학금 매칭용, 선택사항)</span>
+          </label>
+          <select className={fieldCls} value={faculty} onChange={(e) => setFaculty(e.target.value)}>
+            <option value="">선택 안 함 (학과 입력 시 자동 분류)</option>
+            {FACULTIES.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className={labelCls}>
             학과 / 전공 <span className="font-normal text-zinc-400">(입력하면 학과별 장학금까지, 선택사항)</span>
           </label>
           <input
@@ -146,8 +214,11 @@ export default function Home() {
             className={fieldCls}
             value={major}
             onChange={(e) => setMajor(e.target.value)}
-            placeholder="예: 전자공학과, 기계공학과"
+            placeholder="예: 기계공학과, 서어서문학과, 경제학과"
           />
+          <p className="mt-1 text-xs text-zinc-400">
+            계열을 비워두면 학과명으로 자동 분류해요. (예: “기계공학과” → 공학계열)
+          </p>
         </div>
 
         <div>
