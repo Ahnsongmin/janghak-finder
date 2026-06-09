@@ -114,7 +114,7 @@ export function ResultsView({ results }: { results: MatchResult[] }) {
   const [active, setActive] = useState(tabs[0] ?? ALL);
   const [limit, setLimit] = useState(PAGE);
 
-  const baseList = byTab.get(active) ?? [];
+  const baseList = useMemo(() => byTab.get(active) ?? [], [byTab, active]);
   // 현재 탭에서 지원기간 상태별 개수 (필터 버튼 카운트용)
   const counts = useMemo(() => {
     let open = 0;
