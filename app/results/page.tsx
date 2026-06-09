@@ -12,13 +12,21 @@ function buildProfile(sp: Record<string, string | string[] | undefined>): UserPr
   const get = (k: string) => (Array.isArray(sp[k]) ? sp[k]![0] : (sp[k] as string | undefined));
   const ageRaw = get("age");
   const age = ageRaw ? parseInt(ageRaw, 10) : undefined;
+  const gpaRaw = get("gpa");
+  const gpa = gpaRaw ? parseFloat(gpaRaw) : undefined;
+  const gpaScaleRaw = get("gpaScale");
+  const gpaScale = gpaScaleRaw ? parseFloat(gpaScaleRaw) : undefined;
   return {
     region: get("region") ?? "",
     income: Number(get("income") ?? 0),
     age: Number.isFinite(age) ? age : undefined,
     eduStatus: get("edu") ?? "",
     grade: Number(get("grade") ?? 0),
+    gpa: Number.isFinite(gpa) ? gpa : undefined,
+    gpaScale: Number.isFinite(gpaScale) ? gpaScale : undefined,
     univ: get("univ") ?? "",
+    gender: get("gender") ?? "",
+    faculty: get("faculty") ?? "",
     major: get("major") ?? "",
     flags: (get("flags") ?? "").split(",").filter(Boolean),
   };
@@ -38,6 +46,13 @@ export default async function ResultsPage({
   const univName = (Array.isArray(sp.univ) ? sp.univ[0] : sp.univ)?.trim();
   const univ = univName ? UNIV_BY_NAME.get(univName) : undefined;
 
+  // AI 지원서 페이지로 넘길 프로필 파라미터(학과/지역/학년 자동연계)
+  const draftParams = new URLSearchParams();
+  if (user.major) draftParams.set("major", user.major);
+  if (user.region) draftParams.set("region", user.region);
+  if (user.grade) draftParams.set("grade", `${user.grade}학년`);
+  const draftHref = `/draft${draftParams.toString() ? `?${draftParams}` : ""}`;
+
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-10">
       <div className="mb-6 flex items-center justify-between">
@@ -46,6 +61,16 @@ export default async function ResultsPage({
           ← 다시 입력
         </Link>
       </div>
+
+      <Link
+        href={draftHref}
+        className="mb-6 flex items-center justify-between rounded-xl border border-violet-200 bg-violet-50 p-4 transition-colors hover:bg-violet-100"
+      >
+        <span className="text-sm text-violet-800">
+          ✍️ <strong>AI로 지원서 초안 쓰기</strong> — 키워드 몇 개면 담백한 초안을 만들어 드려요
+        </span>
+        <span className="text-violet-500">→</span>
+      </Link>
 
       {demo && (
         <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">

@@ -1,4 +1,35 @@
+import Link from "next/link";
 import type { MatchResult } from "@/lib/types";
+import { type ApplyInfo, fmtMD, daysLeft } from "@/lib/apply-status";
+
+function ApplyBadge({ info }: { info: ApplyInfo }) {
+  if (info.state === "open") {
+    const d = daysLeft(info.end);
+    const tail =
+      info.end != null
+        ? ` · ~${fmtMD(info.end)} 마감${d != null && d >= 0 ? ` (D-${d})` : ""}`
+        : "";
+    return (
+      <span className="rounded-md border border-green-300 bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700">
+        지금 지원 가능{tail}
+      </span>
+    );
+  }
+  if (info.state === "upcoming") {
+    const d = daysLeft(info.start);
+    const tail = d != null && d >= 0 ? ` (D-${d})` : "";
+    return (
+      <span className="rounded-md border border-sky-300 bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">
+        곧 열림 · {fmtMD(info.start)}부터{tail}
+      </span>
+    );
+  }
+  return (
+    <span className="rounded-md border border-zinc-300 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-500">
+      상시·모집기간 모름
+    </span>
+  );
+}
 
 const CATEGORY_COLOR: Record<string, string> = {
   장학금: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -7,12 +38,13 @@ const CATEGORY_COLOR: Record<string, string> = {
   기타: "bg-zinc-100 text-zinc-700 border-zinc-200",
 };
 
-export function ResultCard({ result }: { result: MatchResult }) {
+export function ResultCard({ result, applyInfo }: { result: MatchResult; applyInfo?: ApplyInfo }) {
   const { benefit: b, passed, unknown, status } = result;
 
   return (
     <article className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
       <div className="mb-2 flex flex-wrap items-center gap-2">
+        {applyInfo && <ApplyBadge info={applyInfo} />}
         {status === "eligible" ? (
           <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
             대상 가능
@@ -96,6 +128,14 @@ export function ResultCard({ result }: { result: MatchResult }) {
           >
             공식 사이트에서 신청 →
           </a>
+        )}
+        {(b.category === "장학금" || b.category === "지원금") && (
+          <Link
+            href={`/draft?scholarship=${encodeURIComponent(b.name)}`}
+            className="rounded-lg border border-violet-300 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-100"
+          >
+            ✍️ AI 지원서 초안
+          </Link>
         )}
         {b.lastFetchedAt && (
           <span className="text-xs text-zinc-400">
