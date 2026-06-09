@@ -74,7 +74,11 @@ const FACULTY_KEYWORDS: [Faculty, string[]][] = [
   ],
 ];
 
-const norm = (s: string) => s.replace(/\s|학과|학부|전공|계열|대학/g, "");
+// 접미사를 떼어 "전자공학과"와 "전자공학"을 같게 만든다.
+// 주의: '학과'를 통째로 지우면 '화학공학과'→'화학공'처럼 키워드의 '학'까지 잘려
+//       공학이 자연으로 오분류된다. 그래서 학과/학부는 끝의 '과'/'부'만 떼어 '...학'을 남기고,
+//       전공/계열/대학만 어디서든 제거한다.
+const norm = (s: string) => s.replace(/\s|전공|계열|대학/g, "").replace(/[과부]$/, "");
 
 /** 입력한 학과명에서 계열을 추론한다. 못 찾으면 null. */
 export function facultyOf(major: string): Faculty | null {
