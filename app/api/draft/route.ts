@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     return Response.json(
       {
         error: "NO_KEY",
-        message: "AI 작성 엔진을 점검하고 있어요. 잠시 후 다시 시도해 주세요.",
+        message: "AI 지원서 기능은 오픈 준비 중이에요. 조금만 기다려 주세요 — 장학금 매칭은 지금도 전부 무료로 쓸 수 있어요.",
       },
       { status: 503 },
     );
@@ -103,9 +103,10 @@ export async function POST(req: Request) {
     });
     draft = textOf(first);
   } catch (e) {
+    console.error("[draft] 1차 생성 실패:", e);
     if (usedCode) await refundCredit(usedCode).catch(() => {});
     return Response.json(
-      { error: "GEN_FAILED", message: `초안 생성에 실패했어요. 잠시 후 다시 시도해 주세요. (사용 횟수는 차감되지 않았어요) — ${(e as Error).message}` },
+      { error: "GEN_FAILED", message: "초안 생성에 실패했어요. 잠시 후 다시 시도해 주세요. (사용 횟수는 차감되지 않았어요)" },
       { status: 502 },
     );
   }
@@ -133,8 +134,9 @@ export async function POST(req: Request) {
         stream.on("text", (t) => controller.enqueue(encoder.encode(t)));
         await stream.finalMessage();
       } catch (e) {
+        console.error("[draft] 2차 첨삭 실패:", e);
         if (usedCode) await refundCredit(usedCode).catch(() => {});
-        controller.enqueue(encoder.encode(`\n\n[생성 중 오류] ${(e as Error).message} (이용권은 차감되지 않았어요)`));
+        controller.enqueue(encoder.encode("\n\n[생성 중 오류] 네트워크 문제로 글이 끊겼어요. 잠시 후 다시 시도해 주세요. (이용권은 차감되지 않았어요)"));
       } finally {
         controller.close();
       }
