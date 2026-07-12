@@ -37,6 +37,12 @@ export function getBenefits(): Benefit[] {
   return benefits;
 }
 
+const byId = new Map(benefits.map((b) => [b.id, b]));
+
+export function getBenefitById(id: string): Benefit | undefined {
+  return byId.get(id);
+}
+
 /** 현재 데이터가 예시(데모)만 있는지 — UI 경고 배너 표시에 사용 */
 export function isDemoData(): boolean {
   return benefits.length > 0 && benefits.every((b) => b.demo === true);

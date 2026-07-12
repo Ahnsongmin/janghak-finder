@@ -1,9 +1,53 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { DRAFT_TONES, type DraftTone } from "@/lib/draft-prompt";
+
+type Gate = {
+  enabled: boolean;
+  freeUsed: boolean;
+  remaining: number | null;
+  clientKey: string | null;
+  packs: Record<string, { credits: number; amount: number; name: string }>;
+};
+
+const CREDIT_KEY = "jf_credit";
+
+function storedCode(): string | null {
+  try {
+    return (JSON.parse(localStorage.getItem(CREDIT_KEY) ?? "null") as { code?: string } | null)?.code ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** 토스 v2 SDK를 1회 로드하고 결제창을 띄운다. successUrl로 paymentKey 등이 붙어 돌아온다. */
+async function startTossPayment(clientKey: string, packId: string, pack: Gate["packs"][string]) {
+  if (!document.querySelector('script[src^="https://js.tosspayments.com/v2"]')) {
+    await new Promise<void>((ok, fail) => {
+      const s = document.createElement("script");
+      s.src = "https://js.tosspayments.com/v2/standard";
+      s.onload = () => ok();
+      s.onerror = () => fail(new Error("결제 모듈을 불러오지 못했어요."));
+      document.head.appendChild(s);
+    });
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const TossPayments = (window as any).TossPayments;
+  const payments = TossPayments(clientKey).payments({ customerKey: TossPayments.ANONYMOUS });
+  const orderId = `jf${packId}-${crypto.randomUUID().replace(/-/g, "").slice(0, 20)}`;
+  await payments.requestPayment({
+    method: "CARD",
+    amount: { currency: "KRW", value: pack.amount },
+    orderId,
+    orderName: pack.name,
+    successUrl: `${location.origin}/draft/success`,
+    failUrl: `${location.origin}/draft?pay=fail`,
+    card: { useEscrow: false, flowMode: "DEFAULT", useCardPoint: false, useAppCardOnly: false },
+  });
+}
 
 const PRESETS: { label: string; question: string; chars: number }[] = [
   { label: "지원 동기", question: "이 장학금에 지원하게 된 동기를 작성해 주세요.", chars: 600 },
@@ -34,6 +78,58 @@ function DraftForm() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
 
+  const [gate, setGate] = useState<Gate | null>(null);
+  const [creditCode, setCreditCode] = useState<string | null>(null);
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [payError, setPayError] = useState(sp.get("pay") === "fail" ? "결제가 취소되거나 실패했어요." : "");
+
+  useEffect(() => {
+    const code = storedCode();
+    setCreditCode(code);
+    fetch(`/api/gate${code ? `?code=${encodeURIComponent(code)}` : ""}`)
+      .then((r) => r.json())
+      .then((g: Gate) => {
+        setGate(g);
+        setRemaining(g.remaining);
+      })
+      .catch(() => {});
+  }, []);
+
+  // 결제가 필요한 상태: 게이트 켜짐 + 무료 소진 + 쓸 수 있는 이용권 없음
+  const needPay = Boolean(gate?.enabled && gate.freeUsed && !(creditCode && (remaining ?? 0) > 0));
+
+  async function buyPack(packId: string) {
+    if (!gate?.clientKey) return;
+    setPayError("");
+    try {
+      await startTossPayment(gate.clientKey, packId, gate.packs[packId]);
+    } catch (e) {
+      // 사용자가 결제창을 닫은 경우 포함
+      const msg = (e as Error).message ?? "";
+      if (!/취소/.test(msg)) setPayError(msg || "결제를 시작하지 못했어요.");
+    }
+  }
+
+  const [codeInput, setCodeInput] = useState("");
+
+  async function applyCode() {
+    const code = codeInput.trim().toUpperCase();
+    if (!code) return;
+    setPayError("");
+    const g = (await fetch(`/api/gate?code=${encodeURIComponent(code)}`).then((r) => r.json())) as Gate;
+    if (g.remaining === null) {
+      setPayError("이용권 코드를 찾을 수 없어요. 다시 확인해 주세요.");
+      return;
+    }
+    if (g.remaining <= 0) {
+      setPayError("이 코드의 이용권은 모두 사용됐어요.");
+      return;
+    }
+    localStorage.setItem(CREDIT_KEY, JSON.stringify({ code }));
+    setCreditCode(code);
+    setRemaining(g.remaining);
+  }
+
   function applyPreset(p: (typeof PRESETS)[number]) {
     setQuestion(p.question);
     setMaxChars(p.chars);
@@ -48,6 +144,7 @@ function DraftForm() {
     setOutput("");
     setCopied(false);
     setLoading(true);
+    const useCredit = Boolean(gate?.enabled && gate.freeUsed && creditCode && (remaining ?? 0) > 0);
     try {
       const res = await fetch("/api/draft", {
         method: "POST",
@@ -59,12 +156,19 @@ function DraftForm() {
           keywords: keywords.trim(),
           profile: profile.trim() || undefined,
           tone,
+          creditCode: useCredit ? creditCode : undefined,
         }),
       });
 
       if (res.status === 503) {
         const j = await res.json();
         setError(`⚠️ ${j.message}`);
+        return;
+      }
+      if (res.status === 402) {
+        // 서버 기준으로 무료/이용권이 소진됨 — 결제 안내로 전환
+        if (useCredit) setRemaining(0);
+        setGate((g) => (g ? { ...g, freeUsed: true } : g));
         return;
       }
       if (!res.ok || !res.body) {
@@ -80,6 +184,8 @@ function DraftForm() {
         if (done) break;
         setOutput((o) => o + dec.decode(value, { stream: true }));
       }
+      if (useCredit) setRemaining((r) => Math.max(0, (r ?? 1) - 1));
+      else setGate((g) => (g?.enabled ? { ...g, freeUsed: true } : g));
     } catch (e) {
       setError(`오류: ${(e as Error).message}`);
     } finally {
@@ -93,26 +199,34 @@ function DraftForm() {
     setTimeout(() => setCopied(false), 1500);
   }
 
-  const labelCls = "block text-sm font-medium text-zinc-700 mb-1.5";
+  const labelCls = "block text-sm font-semibold text-ink mb-1.5";
   const fieldCls =
-    "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+    "w-full rounded-xl border border-zinc-200 bg-zinc-50/60 px-3.5 py-2.5 text-ink outline-none transition-all focus:border-brand focus:bg-white focus:ring-4 focus:ring-brand/10";
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-5 py-10">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-zinc-900">✍️ AI 지원서 초안 쓰기</h1>
-        <Link href="/" className="text-sm text-blue-600 hover:underline">
+    <main className="mx-auto w-full max-w-2xl px-5 py-9">
+      <div className="mb-5 flex items-center justify-between">
+        <h1 className="text-2xl font-extrabold tracking-tight text-ink">✍️ AI 지원서 초안 쓰기</h1>
+        <Link
+          href="/"
+          className="rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-ink/60 transition-colors hover:border-brand/40 hover:text-brand"
+        >
           ← 홈
         </Link>
       </div>
 
-      <p className="mb-6 text-sm text-zinc-500">
-        양식이 묻는 질문과 키워드 몇 개만 적으면, <strong className="text-zinc-700">사람이 쓴 듯 담백한 초안</strong>을
-        만들어 드려요. 초안을 쓴 뒤 한 번 더 다듬는 2단계 방식이라 결과가 더 자연스러워요. 키워드 밖의 사실은 지어내지
-        않아요. 생성된 글은 초안이니 꼭 본인 사실로 검토·수정 후 제출하세요.
-      </p>
+      <div className="mb-6 rounded-2xl border border-violet-200/70 bg-gradient-to-br from-violet-50 to-white p-4 shadow-card">
+        <p className="text-sm leading-relaxed text-ink/70">
+          <strong className="text-ink">장학금 지원서에 특화된 AI</strong>가 씁니다. 작성 AI가 초안을 쓰면 첨삭 AI가
+          상투어와 AI 티를 걷어내고 다시 다듬는 <strong className="text-ink">2단계 전문 파이프라인</strong>이라,
+          사람이 쓴 듯 담백한 글이 나와요.
+        </p>
+        <p className="mt-2 text-xs text-ink/50">
+          키워드 밖의 사실은 지어내지 않는 게 원칙이에요. 생성된 글은 초안이니 꼭 본인 사실로 검토·수정 후 제출하세요.
+        </p>
+      </div>
 
-      <div className="space-y-5 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <div className="space-y-5 rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-card">
         <div>
           <label className={labelCls}>
             장학금/지원금 이름 <span className="font-normal text-zinc-400">(선택)</span>
@@ -207,19 +321,69 @@ function DraftForm() {
             {error}
           </div>
         )}
+        {payError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{payError}</div>
+        )}
 
-        <button
-          type="button"
-          onClick={generate}
-          disabled={loading}
-          className="w-full rounded-xl bg-blue-600 py-3.5 text-base font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
-        >
-          {loading ? "초안을 쓰고 다듬는 중… (10~30초)" : "초안 만들기"}
-        </button>
+        {needPay ? (
+          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+            <p className="mb-1 text-sm font-semibold text-zinc-800">무료 1회를 모두 사용했어요</p>
+            <p className="mb-3 text-xs text-zinc-500">
+              이용권을 구매하면 계속 쓸 수 있어요. 회원가입 없이 결제 후 받는 코드로 바로 사용돼요.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(gate?.packs ?? {}).map(([id, p]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => buyPack(id)}
+                  className="rounded-lg bg-brand px-3 py-2.5 text-sm font-semibold text-white hover:bg-brand-strong"
+                >
+                  {p.credits}건 · {p.amount.toLocaleString()}원
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 flex gap-2">
+              <input
+                className="flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm uppercase"
+                placeholder="이미 받은 이용권 코드 (JF-…)"
+                value={codeInput}
+                onChange={(e) => setCodeInput(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={applyCode}
+                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+              >
+                적용
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {gate?.enabled && (
+              <p className="text-center text-xs text-zinc-500">
+                {creditCode && (remaining ?? 0) > 0
+                  ? `🎫 이용권 ${remaining}건 남음`
+                  : !gate.freeUsed
+                    ? "✨ 첫 1회는 무료로 써볼 수 있어요"
+                    : null}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={generate}
+              disabled={loading}
+              className="w-full rounded-xl bg-gradient-to-r from-brand to-brand-strong py-3.5 text-base font-bold text-white shadow-brand transition-all hover:brightness-105 active:scale-[.99] disabled:opacity-60 disabled:active:scale-100"
+            >
+              {loading ? "초안을 쓰고 다듬는 중… (10~30초)" : "초안 만들기"}
+            </button>
+          </>
+        )}
       </div>
 
       {(output || loading) && (
-        <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+        <div className="mt-6 rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-card animate-fade-up">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-semibold text-zinc-700">
               초안 <span className="font-normal text-zinc-400">({output.length}자)</span>

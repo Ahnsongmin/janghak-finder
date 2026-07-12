@@ -200,6 +200,139 @@ function checkFaculty(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
     : { v: "fail", msg: `${fac.join("/")} 전용 (내 계열: ${userFac})` };
 }
 
+// ── 원문 기반 자격 필터 ────────────────────────────────────────────────
+// 구조화 필드로 못 잡는 "특정 신분·직군·학교급·자치구 전용" 조건을 rawConditionText에서 포착한다.
+// 데이터 수만 건을 일일이 구조화할 수 없어, 강한 '전용' 신호에만 반응하는 런타임 텍스트 필터로 보강.
+// 보수적 원칙(누락 금지):
+//   - 명백히 불가능(대학생인데 고등학생/연구자 전용 등) → fail(제외)
+//   - 가능성은 있으나 특수신분 필요(교직원 자녀·자치구 거주 등) → unknown(조건확인으로 분리 + 정확한 사유)
+
+/** 대학(원) 재학생임을 시사하는 신호 — 학교급 전용 판정에 사용 */
+function isUniversityStudent(u: UserProfile): boolean {
+  return Boolean(u.univ || u.major || u.grade > 0 || /대학/.test(u.eduStatus));
+}
+
+// 고등학교/중학교 '재학생' 전용 (대학생은 해당 없음). '졸업/대학 진학' 맥락은 제외(대학생 포함 가능).
+const SCHOOL_LEVEL_ONLY =
+  /고등학교\s*[1-3]\s*학년|고교\s*[1-3]\s*학년|고[1-3]\b|중학교\s*[1-3]\s*학년|중학생|고등학생|직업계고|특성화고|마이스터고|위탁과정\s*참여/;
+// 대학/신입생/재학생을 언급하면 대학생도 대상일 수 있어 제외하지 않는다(누락 방지).
+// 흔한 오제외 원인: 대학 신입생 장학금이 평가기준으로 "고등학교 3학년 성적"을 적어두는 경우 →
+// 텍스트에 '대학'이 등장하면 고교 전용으로 보지 않는다.
+// (주의: "고졸"은 고교 취업연계처럼 고졸자 대상 프로그램 설명에도 흔해 가드로 쓰지 않는다)
+const SCHOOL_LEVEL_OK = /대학|신입생|재학생/;
+
+// 의·약학 등 전문 연구자/학술 논문 지원 (학부생, 특히 비(非)의약 계열엔 해당 없음).
+const MED_RESEARCH = /(?:의\/?약학|의학|약학|치의학|한의학|수의학)\s*(?:연구자|연구|학술|학회)|학술\s*부문\s*(?:각?\s*\d+\s*편|논문)/;
+
+// 특정 직군 '재직자/연금적용' 전용. 자녀·가족 동반 여부로 fail↔review 분기.
+const EMPLOYEE_ONLY =
+  /사립학교교직원연금|공무원연금[^\n]{0,6}적용|군인연금[^\n]{0,6}적용|재직\s*(?:중인\s*)?(?:교직원|교원|임직원|직원|근로자|교사|공무원)|(?:현직|재직)\s*(?:교사|교수|공무원|군인|경찰|소방관?)/;
+const EMPLOYEE_FAMILY = /자녀|자제|가족|배우자|직계/;
+
+// 자치구(구/군) 단위 거주 전용 — 시도만 입력한 사용자는 확인 불가(시도는 checkRegion이 처리).
+const SGG_RESIDENCE = /([가-힣]{2,4}[구군])\s*(?:에\s*)?(?:거주|주민등록|관내)/;
+
+function rawText(b: Benefit): string {
+  return `${b.name} ${b.rawConditionText ?? ""} ${b.description ?? ""}`;
+}
+
+function checkRawEligibility(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
+  const text = rawText(b);
+
+  // 1) 고/중학생·직업계고·위탁과정 전용 — 대학(원)생은 제외
+  if (isUniversityStudent(u) && SCHOOL_LEVEL_ONLY.test(text) && !SCHOOL_LEVEL_OK.test(text)) {
+    return { v: "fail", msg: "고교·중학생(직업계고/위탁과정 등) 대상 — 대학생은 해당 없음" };
+  }
+
+  // 2) 의·약학 연구자/학술 논문 지원 — 계열을 알고 의약·보건이 아니면 제외, 모르면 확인
+  if (MED_RESEARCH.test(text)) {
+    const fac = resolveFaculty(u.faculty, u.major);
+    if (fac && fac !== "의약·보건계열") {
+      return { v: "fail", msg: `의·약학 연구자/학술 대상 — 내 계열(${fac})은 해당 없음` };
+    }
+    return { v: "unknown", msg: "의·약학 연구자·학술 논문 대상 — 해당 시에만" };
+  }
+
+  // 3) 특정 직군 재직자 전용 — 자녀·가족 포함이면 확인(자녀일 수 있음), 본인 전용이면 제외
+  if (EMPLOYEE_ONLY.test(text)) {
+    if (EMPLOYEE_FAMILY.test(text)) {
+      return { v: "unknown", msg: "특정 직군(교직원·공무원 등) 본인·자녀 전용 — 해당 시에만" };
+    }
+    if (isUniversityStudent(u)) {
+      return { v: "fail", msg: "특정 직군 재직자 본인 전용 — 대학생은 해당 없음" };
+    }
+  }
+
+  // 4) 자치구(구/군) 거주 전용 — 시도만 입력한 사용자는 확인 필요(누락 방지로 제외하지 않음)
+  const m = text.match(SGG_RESIDENCE);
+  if (m) {
+    return { v: "unknown", msg: `${m[1]} 거주자 대상 — 해당 자치구 거주 시에만` };
+  }
+
+  return { v: "pass", msg: "추가 자격조건 없음" };
+}
+
+// ── 성별·생애주기 게이팅 ────────────────────────────────────────────────
+// 복지로 등 전국민 복지에는 특정 인구집단(노인·영유아·임산부·외국인·장애인 등) 전용이 많다.
+// 이름(name)에 강한 전용 신호가 있고 사용자가 그 집단이 아니면 제외/조건확인으로 정리한다.
+//   - 성별 신체조건(임신·출산·산모) → 남성 제외
+//   - 플래그로 매핑되는 집단(외국인/장애/한부모/다문화/북한이탈) → 해당 플래그 미보유 시 제외
+//     (특수자격을 체크 안 했다 = 본인이 그 집단이 아니라고 신고한 것 → 기존 targetGroups 동작과 일관)
+//   - 노인·고령 → 대학(원)생/젊은 사용자면 제외
+//   - 영유아·난임 → 부모일 수 있어 제외 대신 조건확인(누락 방지)
+// 학과·전공 맥락(노인복지학과 등)이나 awareness 프로그램은 오제외하지 않도록 가드를 둔다.
+
+const ACADEMIC_GUARD = /학과|학부|전공|복지학|요양보호사\s*양성|인식\s*개선|예방\s*교육|이해\s*교육/;
+
+function youngUser(u: UserProfile): boolean {
+  return isUniversityStudent(u) || (u.age != null && u.age < 50);
+}
+
+function checkLifeStageGender(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
+  const name = b.name;
+  const text = rawText(b);
+
+  // 1) 임신·출산·산모(신체조건) — 남성 제외. 난임/영유아는 부모 가능성으로 제외 안 함.
+  if (/임신|출산|산모|임산부|모성/.test(name) && !/난임|영유아|영아|기저귀|분유/.test(name)) {
+    if (u.gender === "남성") return { v: "fail", msg: "임신·출산 지원 — 남성은 해당 없음" };
+    return { v: "pass", msg: "" };
+  }
+  // 2) 여성 전용/여성 위기지원 — 남성 제외
+  if (/여성긴급|위기여성|미혼모|여성\s*전용|성매매[^\n]{0,6}피해|여성[^\n]{0,4}쉼터/.test(text) && u.gender === "남성") {
+    return { v: "fail", msg: "여성 대상 지원 — 남성은 해당 없음" };
+  }
+
+  // 3) 플래그 매핑 집단 — 해당 플래그 미보유 시 제외 (이름 기반 강한 신호 + 학과 가드)
+  const has = (f: string) => u.flags.includes(f);
+  if (/외국인|국내체류외국인|이주민|결혼이민|이주노동/.test(name) && !has("다문화가족")) {
+    return { v: "fail", msg: "외국인·이주민 대상 — 해당 없음" };
+  }
+  if (/북한이탈주민|새터민/.test(name) && !has("북한이탈주민")) {
+    return { v: "fail", msg: "북한이탈주민 대상 — 해당 없음(특수자격 미선택)" };
+  }
+  if (/다문화/.test(name) && !has("다문화가족") && !ACADEMIC_GUARD.test(name)) {
+    return { v: "fail", msg: "다문화가족 대상 — 해당 없음(특수자격 미선택)" };
+  }
+  if (/장애인|장애아|장애\s*대학생|중증장애|발달장애/.test(name) && !has("장애인(본인/가족)") && !ACADEMIC_GUARD.test(name)) {
+    return { v: "fail", msg: "장애인 대상 — 해당 없음(특수자격 미선택)" };
+  }
+  if (/한부모|미혼모|조손\s*가정|모자가정|부자가정/.test(name) && !has("한부모가족")) {
+    return { v: "fail", msg: "한부모·조손가정 대상 — 해당 없음(특수자격 미선택)" };
+  }
+
+  // 4) 노인·고령 — 젊은 사용자면 제외 (학과/요양보호사 양성 등은 가드로 제외)
+  if (/노인|어르신|고령자?|경로(?:당|우대)|65세\s*이상|장기요양|치매/.test(name) && youngUser(u) && !ACADEMIC_GUARD.test(name)) {
+    return { v: "fail", msg: "노인·고령자 대상 — 대학생은 해당 없음" };
+  }
+
+  // 5) 영유아·아동(수령 대상이 아동) — 학생-부모 가능성으로 조건확인
+  if (/영유아|영아|어린이집|보육료|아동수당|기저귀|분유/.test(name) && !ACADEMIC_GUARD.test(name)) {
+    return { v: "unknown", msg: "영유아·아동 양육 가구 대상 — 해당 시에만" };
+  }
+
+  return { v: "pass", msg: "생애주기·성별 조건 없음" };
+}
+
 /** 성별 전용 매칭. genderOnly 있고 사용자 성별과 다르면 제외, 미입력이면 표시(확인). */
 function checkGender(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
   if (!b.genderOnly) return { v: "pass", msg: "성별 무관" };
@@ -223,6 +356,8 @@ export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
     checkDepartment(benefit, user),
     checkFaculty(benefit, user),
     checkGender(benefit, user),
+    checkRawEligibility(benefit, user),
+    checkLifeStageGender(benefit, user),
   ];
 
   const passed = checks.filter((c) => c.v === "pass").map((c) => c.msg);

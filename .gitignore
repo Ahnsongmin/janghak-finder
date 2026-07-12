@@ -46,3 +46,6 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# playwright MCP 스크린샷 산출물
+.playwright-mcp/

@@ -1,17 +1,136 @@
 @import "tailwindcss";
 
+/* ────────────────────────────────────────────────────────────
+   장학금 파인더 — 프리미엄 신뢰형 디자인 토큰
+   색 언어: 딥네이비(ink) + 신뢰블루(brand) + 민트(mint) 액센트
+   ──────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f8fb;
+  --surface: #ffffff;
+  --foreground: #0f172a; /* 딥네이비 ink */
+
+  --brand: #2563eb; /* 신뢰블루 */
+  --brand-strong: #1d4ed8;
+  --brand-soft: #eff4ff;
+
+  --mint: #0d9f6e; /* 민트 액센트 */
+  --mint-strong: #047857;
+  --mint-soft: #ecfdf5;
+
+  --ink-900: #0f172a;
+  --ink-700: #334155;
+  --ink-500: #64748b;
+  --ink-400: #94a3b8;
+  --line: #e6e9f0;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-mint: var(--mint);
+  --color-mint-strong: var(--mint-strong);
+  --color-mint-soft: var(--mint-soft);
+  --color-ink: var(--ink-900);
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo",
+    "Malgun Gothic", system-ui, sans-serif;
+}
+
+* {
+  border-color: var(--line);
 }
 
 body {
-  font-family: var(--font-geist-sans), "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-family: var(--font-sans);
+  background: var(--background);
+  color: var(--foreground);
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* 접근성: 키보드 포커스 링 (마우스 클릭엔 안 뜨게) */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ── 프리미엄 카드 그림자 ───────────────────────────────── */
+.shadow-card {
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px -12px rgba(15, 23, 42, 0.12);
+}
+.shadow-card-lg {
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 12px 36px -14px rgba(15, 23, 42, 0.16);
+}
+.shadow-brand {
+  box-shadow: 0 10px 26px -10px rgba(37, 99, 235, 0.5);
+}
+
+/* ── 히어로 메시 배경 ───────────────────────────────────── */
+.hero-mesh {
+  background:
+    radial-gradient(60% 55% at 18% 0%, rgba(37, 99, 235, 0.1), transparent 70%),
+    radial-gradient(55% 45% at 92% 8%, rgba(13, 159, 110, 0.09), transparent 72%);
+}
+
+/* ── 스켈레톤 셔머 로딩 ─────────────────────────────────── */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #eef1f6;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ── 부드러운 등장 ──────────────────────────────────────── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::after,
+  ::before {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

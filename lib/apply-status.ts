@@ -56,3 +56,32 @@ export function daysLeft(end: Date | null, now: Date = new Date()): number | nul
   if (!end) return null;
   return Math.round((startOfDay(end) - startOfDay(now)) / 86400000);
 }
+
+/**
+ * 신청기간 문자열을 사람이 읽기 쉬운 형태로.
+ *   "20260601 ~ 20260815" → "2026.6.1 ~ 8.15"
+ *   "20260601 ~"          → "2026.6.1 ~"
+ *   "~ 20260815"          → "~ 8.15"
+ * 날짜가 아닌 텍스트(상시/직전회차 등)는 원문 그대로 반환.
+ */
+export function fmtPeriod(applyPeriod?: string): string {
+  const p = applyPeriod?.trim();
+  if (!p) return "";
+  const segs = p.split("~").map((s) => s.trim());
+  const full = (d: Date) => `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
+
+  if (segs.length >= 2) {
+    const a = segs[0] ? ymd(segs[0]) : null;
+    const b = segs[1] ? ymd(segs[1]) : null;
+    // 같은 해면 끝 날짜는 연도 생략(6.1 ~ 8.15)
+    if (a && b) {
+      const bStr = a.getFullYear() === b.getFullYear() ? fmtMD(b) : full(b);
+      return `${full(a)} ~ ${bStr}`;
+    }
+    if (a) return `${full(a)} ~`;
+    if (b) return `~ ${full(b)}`;
+    return p; // 둘 다 날짜 아님 → 원문
+  }
+  const only = ymd(p);
+  return only ? full(only) : p;
+}

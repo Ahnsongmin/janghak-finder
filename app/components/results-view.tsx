@@ -155,89 +155,102 @@ export function ResultsView({ results }: { results: MatchResult[] }) {
   return (
     <div>
       {closedCount > 0 && (
-        <p className="mb-3 text-xs text-zinc-400">
+        <p className="mb-3 text-xs text-ink/40">
           모집기간이 지난 {closedCount}건은 숨겼어요. (날짜 미정·상시 항목은 ‘전체’에 포함)
         </p>
       )}
 
-      {/* 테마 탭 */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        {tabs.map((t) => {
-          const on = t === active;
-          const count = byTab.get(t)?.length ?? 0;
-          return (
-            <button
-              key={t}
-              type="button"
-              onClick={() => selectTab(t)}
-              className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
-                on
-                  ? "border-blue-600 bg-blue-600 text-white"
-                  : "border-zinc-300 bg-white text-zinc-600 hover:border-zinc-400"
-              }`}
-            >
-              {t} <span className={on ? "text-blue-100" : "text-zinc-400"}>{count}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* 필터 패널 — 탭 + 지원기간 + 정렬을 하나의 묶음으로 */}
+      <div className="mb-5 rounded-2xl border border-zinc-200/80 bg-white/95 p-3.5 shadow-card sm:p-4">
+        {/* 테마 탭 */}
+        <div className="flex flex-wrap gap-2">
+          {tabs.map((t) => {
+            const on = t === active;
+            const count = byTab.get(t)?.length ?? 0;
+            return (
+              <button
+                key={t}
+                type="button"
+                aria-pressed={on}
+                onClick={() => selectTab(t)}
+                className={`rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-all ${
+                  on
+                    ? "border-brand bg-brand text-white shadow-brand"
+                    : "border-zinc-200 bg-white text-ink/65 hover:border-brand/40 hover:text-brand"
+                }`}
+              >
+                {t}{" "}
+                <span className={on ? "text-white/70" : "text-ink/40"}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
 
-      {/* 지원기간 상태 필터 */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-zinc-400 shrink-0">지원기간:</span>
-        {STATE_FILTERS.map((f) => {
-          const on = stateFilter === f.value;
-          const c =
-            f.value === "open"
-              ? counts.open
-              : f.value === "upcoming"
-                ? counts.upcoming
-                : f.value === "always"
-                  ? counts.always
-                  : counts.all;
-          return (
-            <button
-              key={f.value}
-              type="button"
-              onClick={() => changeState(f.value)}
-              className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-                on
-                  ? "border-green-600 bg-green-600 text-white"
-                  : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-400"
-              }`}
-            >
-              {f.label} <span className={on ? "text-green-100" : "text-zinc-400"}>{c}</span>
-            </button>
-          );
-        })}
-      </div>
+        <div className="my-3 h-px bg-zinc-100" />
 
-      {/* 정렬 */}
-      <div className="mb-5 flex flex-wrap items-center gap-2">
-        <span className="text-xs text-zinc-400 shrink-0">정렬:</span>
-        {SORT_OPTIONS.map((opt) => {
-          const on = sortOrder === opt.value;
-          return (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => changeSort(opt.value)}
-              className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-                on
-                  ? "border-zinc-700 bg-zinc-800 text-white"
-                  : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-400"
-              }`}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
+        {/* 지원기간 상태 필터 */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="shrink-0 text-xs font-semibold text-ink/40">지원기간</span>
+          {STATE_FILTERS.map((f) => {
+            const on = stateFilter === f.value;
+            const c =
+              f.value === "open"
+                ? counts.open
+                : f.value === "upcoming"
+                  ? counts.upcoming
+                  : f.value === "always"
+                    ? counts.always
+                    : counts.all;
+            return (
+              <button
+                key={f.value}
+                type="button"
+                aria-pressed={on}
+                onClick={() => changeState(f.value)}
+                className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-all ${
+                  on
+                    ? "border-mint bg-mint text-white"
+                    : "border-zinc-200 bg-white text-ink/55 hover:border-mint/40 hover:text-mint-strong"
+                }`}
+              >
+                {f.label} <span className={on ? "text-white/75" : "text-ink/40"}>{c}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 정렬 */}
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          <span className="shrink-0 text-xs font-semibold text-ink/40">정렬</span>
+          {SORT_OPTIONS.map((opt) => {
+            const on = sortOrder === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                aria-pressed={on}
+                onClick={() => changeSort(opt.value)}
+                className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-all ${
+                  on
+                    ? "border-ink bg-ink text-white"
+                    : "border-zinc-200 bg-white text-ink/55 hover:border-zinc-400"
+                }`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* 카드 목록 */}
       {shown.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center text-sm text-zinc-500">
-          이 조건에 해당하는 항목이 없어요. ‘지원기간’ 필터를 ‘전체’로 바꿔 보세요.
+        <div className="rounded-2xl border border-zinc-200/80 bg-white p-10 text-center shadow-card">
+          <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-zinc-100 text-2xl">
+            🔍
+          </div>
+          <p className="text-sm font-semibold text-ink/70">이 조건에 해당하는 항목이 없어요</p>
+          <p className="mt-1 text-sm text-ink/45">‘지원기간’ 필터를 ‘전체’로 바꿔 보세요.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -251,7 +264,7 @@ export function ResultsView({ results }: { results: MatchResult[] }) {
         <button
           type="button"
           onClick={() => setLimit((n) => n + PAGE)}
-          className="mt-5 w-full rounded-xl border border-zinc-300 bg-white py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+          className="mt-5 w-full rounded-xl border border-zinc-200 bg-white py-3.5 text-sm font-bold text-ink/70 shadow-card transition-all hover:border-brand/40 hover:text-brand"
         >
           더 보기 ({list.length - limit}건 남음)
         </button>
