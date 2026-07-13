@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -62,6 +63,7 @@ export default function RootLayout({
           <br />
           정확한 조건은 반드시 공식 페이지에서 확인하세요.
         </footer>
+        <Analytics />
       </body>
     </html>
   );
