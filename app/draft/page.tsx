@@ -36,9 +36,9 @@ async function startTossPayment(clientKey: string, packId: string, pack: Gate["p
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const TossPayments = (window as any).TossPayments;
-  const payments = TossPayments(clientKey).payments({ customerKey: TossPayments.ANONYMOUS });
+  const payment = TossPayments(clientKey).payment({ customerKey: TossPayments.ANONYMOUS });
   const orderId = `jf${packId}-${crypto.randomUUID().replace(/-/g, "").slice(0, 20)}`;
-  await payments.requestPayment({
+  await payment.requestPayment({
     method: "CARD",
     amount: { currency: "KRW", value: pack.amount },
     orderId,
