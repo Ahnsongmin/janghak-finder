@@ -49,3 +49,6 @@ next-env.d.ts
 
 # playwright MCP 스크린샷 산출물
 .playwright-mcp/
+
+# KOSAF raw CSV (data.go.kr 15028252 다운로드 산물 - build-kosaf-scholarships.py 입력)
+data/_raw_kosaf_univ.csv

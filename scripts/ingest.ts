@@ -67,12 +67,17 @@ async function main() {
       console.log("[전국대학] 수집 시작…");
       const univs = await fetchUniversities(dataKey);
       const uniqByName = [...new Map(univs.map((u) => [u.name, u])).values()];
-      writeFileSync(
-        resolve(process.cwd(), "data", "universities.json"),
-        JSON.stringify(uniqByName, null, 2),
-        "utf8",
-      );
-      console.log(`[전국대학] ${univs.length}건 수집 → 중복제거 ${uniqByName.length}개 저장`);
+      // 0건이면 기존 파일 유지 — API 장애·응답구조 변경 시 대학 선택 폼이 통째로 비는 사고 방지
+      if (uniqByName.length === 0) {
+        console.warn("⚠️  [전국대학] 0건 수집 → 기존 universities.json 유지");
+      } else {
+        writeFileSync(
+          resolve(process.cwd(), "data", "universities.json"),
+          JSON.stringify(uniqByName, null, 2),
+          "utf8",
+        );
+        console.log(`[전국대학] ${univs.length}건 수집 → 중복제거 ${uniqByName.length}개 저장`);
+      }
     } catch (e) {
       console.error("[전국대학] 실패:", (e as Error).message);
     }

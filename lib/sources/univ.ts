@@ -28,11 +28,26 @@ interface RawUniv {
   lctnRoadNmAddr?: string;
 }
 
+// 2026-08 현재 응답: {header, body:{items:{item:[...]}}} — 과거의 response 래퍼 형태도 함께 지원
+interface ApiBody {
+  totalCount?: number | string;
+  items?: RawUniv[] | { item?: RawUniv[] };
+}
 interface ApiResponse {
+  header?: { resultCode?: string; resultMsg?: string };
+  body?: ApiBody;
   response?: {
     header?: { resultCode?: string; resultMsg?: string };
-    body?: { totalCount?: number; items?: RawUniv[] };
+    body?: ApiBody;
   };
+}
+
+function extractBody(data: ApiResponse): { items: RawUniv[]; total: number | undefined } {
+  const body = data.body ?? data.response?.body;
+  const rawItems = body?.items;
+  const items = Array.isArray(rawItems) ? rawItems : (rawItems?.item ?? []);
+  const total = body?.totalCount !== undefined ? Number(body.totalCount) : undefined;
+  return { items, total };
 }
 
 function normalizeHomepage(url?: string): string | undefined {
@@ -83,12 +98,11 @@ export async function fetchUniversities(serviceKey: string, numOfRows = 500): Pr
     }
     if (!data) break;
 
-    const items = data.response?.body?.items ?? [];
+    const { items, total } = extractBody(data);
     if (items.length === 0) break;
     out.push(...items.map(normalize));
 
-    const total = data.response?.body?.totalCount ?? out.length;
-    if (out.length >= total || pageNo > 50) break;
+    if (out.length >= (total ?? out.length) || pageNo > 50) break;
     pageNo += 1;
   }
 

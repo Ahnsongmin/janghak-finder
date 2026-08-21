@@ -1,5 +1,311 @@
 [
   {
+    "name": "평택대학교 물류·정보·경영대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "경기도",
+    "foundation": "사립",
+    "branch": "본교",
+    "address": "경기도 평택시 서동대로 3825"
+  },
+  {
+    "name": "평택대학교 물류·문화·정보대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "경기도",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.ptu.ac.kr",
+    "address": "경기도 평택시 서동대로 3825"
+  },
+  {
+    "name": "평택대학교 물류·정보대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "경기도",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.ptu.ac.kr",
+    "address": "경기도 평택시 서동대로 3825"
+  },
+  {
+    "name": "평택대학교 사회복지대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "경기도",
+    "foundation": "사립",
+    "branch": "본교",
+    "address": "경기도 평택시 서동대로 3825"
+  },
+  {
+    "name": "평택대학교 상담대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "경기도",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.ptu.ac.kr",
+    "address": "경기도 평택시 서동대로 3825"
+  },
+  {
+    "name": "평택대학교 일반대학원",
+    "type": "대학원",
+    "schoolType": "일반대학원",
+    "region": "경기도",
+    "foundation": "사립",
+    "branch": "본교",
+    "address": "경기도 평택시 서동대로 3825"
+  },
+  {
+    "name": "총신대학교 목회신학대학원",
+    "type": "대학원",
+    "schoolType": "전문대학원",
+    "region": "서울특별시",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.chongshin.ac.kr",
+    "address": "서울특별시 동작구 사당로 143"
+  },
+  {
+    "name": "총신대학교 사회복지대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "서울특별시",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.chongshin.ac.kr",
+    "address": "서울특별시 동작구 사당로 143"
+  },
+  {
+    "name": "총신대학교 상담대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "서울특별시",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.chongshin.ac.kr",
+    "address": "서울특별시 동작구 사당로 143"
+  },
+  {
+    "name": "총신대학교 선교대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "서울특별시",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.chongshin.ac.kr",
+    "address": "서울특별시 동작구 사당로 143"
+  },
+  {
+    "name": "총신대학교 신학대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "경기도",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.chongshin.ac.kr",
+    "address": "경기도 용인시 처인구 양지면 학촌로 110"
+  },
+  {
+    "name": "총신대학교 일반대학원",
+    "type": "대학원",
+    "schoolType": "일반대학원",
+    "region": "서울특별시",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.chongshin.ac.kr",
+    "address": "서울특별시 동작구 사당로 143"
+  },
+  {
+    "name": "총신대학교 통일개발대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "서울특별시",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://www.chongshin.ac.kr",
+    "address": "서울특별시 동작구 사당로 143"
+  },
+  {
+    "name": "추계예술대학교 교육대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "서울특별시",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://grad.chugye.ac.kr",
+    "address": "서울특별시 서대문구 북아현로11가길 7"
+  },
+  {
+    "name": "추계예술대학교 문화예술경영대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "서울특별시",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://grad.chugye.ac.kr",
+    "address": "서울특별시 서대문구 북아현로11가길 7"
+  },
+  {
+    "name": "추계예술대학교 일반대학원",
+    "type": "대학원",
+    "schoolType": "일반대학원",
+    "region": "서울특별시",
+    "foundation": "사립",
+    "branch": "본교",
+    "homepage": "https://grad.chugye.ac.kr",
+    "address": "서울특별시 서대문구 북아현로11가길 7"
+  },
+  {
+    "name": "춘천교육대학교 교육대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "강원특별자치도",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://www.cnue.ac.kr/graduate",
+    "address": "강원특별자치도 춘천시 공지로 126"
+  },
+  {
+    "name": "충남대학교 경영대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://mba.cnu.ac.kr",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 교육대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://egc.cnu.ac.kr",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 국가정책대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://gnpp.cnu.ac.kr",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 대학원",
+    "type": "대학원",
+    "schoolType": "일반대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://grad.cnu.ac.kr/",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 법학전문대학원",
+    "type": "대학원",
+    "schoolType": "전문대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://law.cnu.ac.kr/",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 보건대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://gsph.cnu.ac.kr",
+    "address": "대전광역시 중구 문화로 266"
+  },
+  {
+    "name": "충남대학교 분석과학기술대학원",
+    "type": "대학원",
+    "schoolType": "전문대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://grast.cnu.ac.kr/",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 산업대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://ind.cnu.ac.kr/",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 스마트농업대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://smart.cnu.ac.kr/smart/index.do",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 신약전문대학원",
+    "type": "대학원",
+    "schoolType": "전문대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://gsdd.cnu.ac.kr",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 에너지과학기술대학원",
+    "type": "대학원",
+    "schoolType": "전문대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://gest.cnu.ac.kr",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 의학전문대학원",
+    "type": "대학원",
+    "schoolType": "전문대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 특허법무대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://homepage.cnu.ac.kr/cnuip",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
+    "name": "충남대학교 평화안보대학원",
+    "type": "대학원",
+    "schoolType": "특수대학원",
+    "region": "대전광역시",
+    "foundation": "국립",
+    "branch": "본교",
+    "homepage": "https://peace.cnu.ac.kr/",
+    "address": "대전광역시 유성구 대학로 99"
+  },
+  {
     "name": "중앙대학교 대학원",
     "type": "대학원",
     "schoolType": "일반대학원",
@@ -18945,311 +19251,5 @@
     "foundation": "사립",
     "branch": "본교",
     "address": "경기도 평택시 서동대로 3825"
-  },
-  {
-    "name": "평택대학교 물류·정보·경영대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "경기도",
-    "foundation": "사립",
-    "branch": "본교",
-    "address": "경기도 평택시 서동대로 3825"
-  },
-  {
-    "name": "평택대학교 물류·문화·정보대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "경기도",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.ptu.ac.kr",
-    "address": "경기도 평택시 서동대로 3825"
-  },
-  {
-    "name": "평택대학교 물류·정보대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "경기도",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.ptu.ac.kr",
-    "address": "경기도 평택시 서동대로 3825"
-  },
-  {
-    "name": "평택대학교 사회복지대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "경기도",
-    "foundation": "사립",
-    "branch": "본교",
-    "address": "경기도 평택시 서동대로 3825"
-  },
-  {
-    "name": "평택대학교 상담대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "경기도",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.ptu.ac.kr",
-    "address": "경기도 평택시 서동대로 3825"
-  },
-  {
-    "name": "평택대학교 일반대학원",
-    "type": "대학원",
-    "schoolType": "일반대학원",
-    "region": "경기도",
-    "foundation": "사립",
-    "branch": "본교",
-    "address": "경기도 평택시 서동대로 3825"
-  },
-  {
-    "name": "총신대학교 목회신학대학원",
-    "type": "대학원",
-    "schoolType": "전문대학원",
-    "region": "서울특별시",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.chongshin.ac.kr",
-    "address": "서울특별시 동작구 사당로 143"
-  },
-  {
-    "name": "총신대학교 사회복지대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "서울특별시",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.chongshin.ac.kr",
-    "address": "서울특별시 동작구 사당로 143"
-  },
-  {
-    "name": "총신대학교 상담대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "서울특별시",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.chongshin.ac.kr",
-    "address": "서울특별시 동작구 사당로 143"
-  },
-  {
-    "name": "총신대학교 선교대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "서울특별시",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.chongshin.ac.kr",
-    "address": "서울특별시 동작구 사당로 143"
-  },
-  {
-    "name": "총신대학교 신학대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "경기도",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.chongshin.ac.kr",
-    "address": "경기도 용인시 처인구 양지면 학촌로 110"
-  },
-  {
-    "name": "총신대학교 일반대학원",
-    "type": "대학원",
-    "schoolType": "일반대학원",
-    "region": "서울특별시",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.chongshin.ac.kr",
-    "address": "서울특별시 동작구 사당로 143"
-  },
-  {
-    "name": "총신대학교 통일개발대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "서울특별시",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://www.chongshin.ac.kr",
-    "address": "서울특별시 동작구 사당로 143"
-  },
-  {
-    "name": "추계예술대학교 교육대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "서울특별시",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://grad.chugye.ac.kr",
-    "address": "서울특별시 서대문구 북아현로11가길 7"
-  },
-  {
-    "name": "추계예술대학교 문화예술경영대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "서울특별시",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://grad.chugye.ac.kr",
-    "address": "서울특별시 서대문구 북아현로11가길 7"
-  },
-  {
-    "name": "추계예술대학교 일반대학원",
-    "type": "대학원",
-    "schoolType": "일반대학원",
-    "region": "서울특별시",
-    "foundation": "사립",
-    "branch": "본교",
-    "homepage": "https://grad.chugye.ac.kr",
-    "address": "서울특별시 서대문구 북아현로11가길 7"
-  },
-  {
-    "name": "춘천교육대학교 교육대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "강원특별자치도",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://www.cnue.ac.kr/graduate",
-    "address": "강원특별자치도 춘천시 공지로 126"
-  },
-  {
-    "name": "충남대학교 경영대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://mba.cnu.ac.kr",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 교육대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://egc.cnu.ac.kr",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 국가정책대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://gnpp.cnu.ac.kr",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 대학원",
-    "type": "대학원",
-    "schoolType": "일반대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://grad.cnu.ac.kr/",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 법학전문대학원",
-    "type": "대학원",
-    "schoolType": "전문대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://law.cnu.ac.kr/",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 보건대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://gsph.cnu.ac.kr",
-    "address": "대전광역시 중구 문화로 266"
-  },
-  {
-    "name": "충남대학교 분석과학기술대학원",
-    "type": "대학원",
-    "schoolType": "전문대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://grast.cnu.ac.kr/",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 산업대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://ind.cnu.ac.kr/",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 스마트농업대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://smart.cnu.ac.kr/smart/index.do",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 신약전문대학원",
-    "type": "대학원",
-    "schoolType": "전문대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://gsdd.cnu.ac.kr",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 에너지과학기술대학원",
-    "type": "대학원",
-    "schoolType": "전문대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://gest.cnu.ac.kr",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 의학전문대학원",
-    "type": "대학원",
-    "schoolType": "전문대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 특허법무대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://homepage.cnu.ac.kr/cnuip",
-    "address": "대전광역시 유성구 대학로 99"
-  },
-  {
-    "name": "충남대학교 평화안보대학원",
-    "type": "대학원",
-    "schoolType": "특수대학원",
-    "region": "대전광역시",
-    "foundation": "국립",
-    "branch": "본교",
-    "homepage": "https://peace.cnu.ac.kr/",
-    "address": "대전광역시 유성구 대학로 99"
   }
 ]

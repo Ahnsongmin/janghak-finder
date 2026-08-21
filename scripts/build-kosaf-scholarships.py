@@ -256,7 +256,7 @@ def build():
             "applyPeriod": apply_period,
             "applyUrl": homepage or "https://www.kosaf.go.kr",
             "rawConditionText": raw,
-            "lastFetchedAt": "2026-06-09",
+            "lastFetchedAt": date.today().isoformat(),
         }
         if income_note:
             benefit["incomeNote"] = income_note

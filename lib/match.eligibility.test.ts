@@ -22,13 +22,13 @@ const user: UserProfile = {
 // 명백히 불가능 → 제외(excluded).
 const SHOULD_EXCLUDE = [
   "youthcenter:20260311005400112111", // 직업계고/위탁과정 고3 전용 — 대학생은 불가
-  "kosaf-schol:185:재단법인 한독제", // 의/약학 연구자 학술 — 공학 학부생 불가
+  "kosaf-schol:187:재단법인 한독제", // 의/약학 연구자 학술 — 공학 학부생 불가
 ];
 
 // 가능성은 있으나 특수신분 필요 → 조건확인(review)으로 분리 + 정확한 사유 노출.
 const SHOULD_REVIEW_WITH_NOTE: { id: string; note: RegExp }[] = [
-  { id: "kosaf-schol:1114:사립학교교직원연", note: /교직원|연금/ }, // 본인·자녀 전용
-  { id: "youthcenter:20260415005400212750", note: /중랑구|거주/ }, // 자치구 거주
+  { id: "kosaf-schol:1118:사립학교교직원연", note: /교직원|연금/ }, // 본인·자녀 전용
+  { id: "youthcenter:20260415005400212749", note: /중랑구|거주/ }, // 자치구 거주
 ];
 
 describe("원문 기반 자격 필터 — 일반 학부생 오노출 방지", () => {

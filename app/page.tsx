@@ -95,7 +95,7 @@ export default function Home() {
             <span className="grid h-4 w-4 place-items-center rounded-full bg-brand text-[9px] text-white">
               ✓
             </span>
-            정부 공식 데이터 9,400여 건 실시간 매칭
+            정부 공식 데이터 9,800여 건 실시간 매칭
           </div>
           <h1 className="text-[32px] font-extrabold leading-[1.22] tracking-tight text-ink sm:text-[42px]">
             나라가 주는 돈,
@@ -103,7 +103,7 @@ export default function Home() {
             안 받으면 <span className="bg-gradient-to-r from-brand to-mint bg-clip-text text-transparent">그냥 사라져요</span>
           </h1>
           <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-ink/55">
-            장학금·지원금 <b className="text-ink/80">9,400여 건</b> 중에 내가 받을 수 있는 것만 골라드려요.
+            장학금·지원금 <b className="text-ink/80">9,800여 건</b> 중에 내가 받을 수 있는 것만 골라드려요.
             <br className="hidden sm:block" />
             입력 30초, 로그인 없음.
           </p>
@@ -373,7 +373,7 @@ export default function Home() {
         <section className="mt-14 grid gap-3 text-center sm:grid-cols-3">
           {[
             ["1", "조건 입력", "30초면 충분해요"],
-            ["2", "자동 매칭", "9,400여 건에서 골라드려요"],
+            ["2", "자동 매칭", "9,800여 건에서 골라드려요"],
             ["3", "바로 신청", "공식 링크 + AI 지원서 초안"],
           ].map(([n, t, d]) => (
             <div key={n} className="rounded-2xl border border-zinc-200/80 bg-white/95 p-6 shadow-card">

@@ -129,6 +129,8 @@ export async function fetchBokjiro(serviceKey: string, kind: BokjiroKind, numOfR
   const out: Benefit[] = [];
   let pageNo = 1;
 
+  let total: number | null = null;
+
   while (true) {
     const url = new URL(ENDPOINTS[kind]);
     url.searchParams.set("serviceKey", serviceKey);
@@ -137,22 +139,38 @@ export async function fetchBokjiro(serviceKey: string, kind: BokjiroKind, numOfR
     url.searchParams.set("numOfRows", String(numOfRows));
     url.searchParams.set("srchKeyCode", "003"); // 통합검색(전체)
 
-    const res = await fetch(url);
-    const text = await res.text();
-    if (!res.ok || text.startsWith("Forbidden") || text.includes("Unexpected")) {
-      throw new Error(`복지로(${kind}) 응답 오류 HTTP ${res.status}: ${text.slice(0, 120)}`);
+    // API가 간헐적으로 빈 응답/오류를 주므로 페이지 단위 재시도(백오프).
+    // 재시도 없이는 중간 페이지 1회 실패만으로 수집이 조용히 끊긴다(부분 데이터 사고).
+    let items: ServItem[] = [];
+    for (let attempt = 1; attempt <= 4; attempt++) {
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        if (!res.ok || text.startsWith("Forbidden") || text.includes("Unexpected")) {
+          throw new Error(`복지로(${kind}) 응답 오류 HTTP ${res.status}: ${text.slice(0, 120)}`);
+        }
+        const json = parser.parse(text);
+        const root = json.wantedList ?? json.response?.body ?? json;
+        items = asArray<ServItem>(root.servList ?? root.items?.item);
+        if (total == null && root.totalCount != null) total = Number(root.totalCount);
+        // 아직 total만큼 못 모았는데 빈 페이지면 일시 오류로 보고 재시도
+        if (items.length > 0 || (total != null && out.length >= total)) break;
+        if (attempt === 4) break;
+      } catch (e) {
+        if (attempt === 4) throw e;
+      }
+      await new Promise((r) => setTimeout(r, attempt * 800));
     }
 
-    const json = parser.parse(text);
-    const root = json.wantedList ?? json.response?.body ?? json;
-    const items = asArray<ServItem>(root.servList ?? root.items?.item);
     if (items.length === 0) break;
     out.push(...items.map((it) => normalize(it, kind, fetchedAt)));
 
-    const total = Number(root.totalCount ?? out.length);
-    if (out.length >= total || pageNo > 500) break;
+    if (out.length >= (total ?? out.length) || pageNo > 500) break;
     pageNo += 1;
   }
 
+  if (total != null && out.length < total) {
+    console.warn(`⚠️  복지로(${kind}) 부분 수집: ${out.length}/${total}건 — 일부 페이지 실패`);
+  }
   return out;
 }
