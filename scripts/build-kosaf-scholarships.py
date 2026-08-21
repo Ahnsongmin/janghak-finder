@@ -80,6 +80,49 @@ def extract_regions(org: str, region_detail: str, special: str, is_regional: boo
     # 추출 완전 실패: 지역연고형이면 미상(노이즈 방지), 아니면 전국 대상
     return [] if is_regional else ["전국"]
 
+def edu_status(grade_field: str, univ_field: str) -> list:
+    """학년구분(우선)·대학구분(보조)에서 재학상태를 구조화. 종전엔 전부 '대학생(재학)' 하드코딩이라
+    대학원 전용 장학금이 학부생에게 노출되던 버그의 근본 수정."""
+    g, uv = grade_field or "", univ_field or ""
+    out = []
+    if re.search(r"대학\d학기|대학8학기이상", g):
+        out.append("대학생(재학)")
+    if "대학신입생" in g:
+        out.append("신입생/예비대학생")
+    if re.search(r"석사|박사", g):
+        out.append("대학원생")
+    if out:
+        return out
+    # 학년구분이 '해당없음' 등이면 대학구분으로 추정
+    if re.search(r"4년제|전문대\(|기술대학|원격대학|학점은행제|해외대학", uv):
+        out.append("대학생(재학)")
+    if "대학원" in uv:
+        out.append("대학원생")
+    if out:
+        return out
+    if "제한없음" in (g + uv):
+        return []  # 명시적 무관
+    return ["대학생(재학)"]  # 데이터셋 자체가 대학생 학자금 — 기존 기본값 유지
+
+
+def univ_levels(univ_field: str) -> list:
+    """대학구분 → 대학 수준 토큰. '전문대(2~3년제)'는 '전문대학원'과 구분해 '전문대(' 로 검출.
+    비거나 해당없음/제한없음 포함이면 [](무관)."""
+    uv = (univ_field or "").strip()
+    if not uv or "해당없음" in uv or "제한없음" in uv:
+        return []
+    lv = []
+    if "4년제" in uv: lv.append("4년제")
+    if "전문대(" in uv: lv.append("전문대")
+    if "일반대학원" in uv or "전문대학원" in uv: lv.append("대학원")
+    if "원격대학" in uv: lv.append("원격대학")
+    if "기술대학" in uv: lv.append("기술대학")
+    if "학점은행제" in uv: lv.append("학점은행제")
+    if "해외대학" in uv: lv.append("해외대학")
+    if "특정대학" in uv: lv.append("특정대학")
+    return lv
+
+
 def extract_faculties(dept_field: str) -> list:
     """학과구분 셀에서 계열 추출. '제한없음' 또는 전 계열 나열이면 무관([])."""
     d = dept_field or ""
@@ -200,6 +243,8 @@ def build():
         is_regional = (r.get("학자금유형구분") or "").strip() == "지역연고"
         regions = extract_regions(org, region_detail, special, is_regional)
         faculties = extract_faculties(r.get("학과구분", ""))
+        edu = edu_status(r.get("학년구분", ""), r.get("대학구분", ""))
+        levels = univ_levels(r.get("대학구분", ""))
         elig = extract_eligibility(special)  # 군자녀·여성·특정대학·보훈/문중 하드제약
 
         # 소득 note: 심사형이면 means-test 신호 포함 (match.ts MEANS_TESTED와 호응)
@@ -244,7 +289,8 @@ def build():
             "incomeMax": None,
             "ageMin": None,
             "ageMax": None,
-            "eduStatus": ["대학생(재학)"],
+            "eduStatus": edu,
+            "univLevels": levels or None,
             "grades": [],
             "requiredFlags": elig.get("requiredFlags", []),
             "targetGroups": elig.get("targetGroups", []),

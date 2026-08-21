@@ -14,6 +14,8 @@ function buildProfile(sp: Record<string, string | string[] | undefined>): UserPr
   const age = ageRaw ? parseInt(ageRaw, 10) : undefined;
   const gpaRaw = get("gpa");
   const gpa = gpaRaw ? parseFloat(gpaRaw) : undefined;
+  const lastGpaRaw = get("lastGpa");
+  const lastGpa = lastGpaRaw ? parseFloat(lastGpaRaw) : undefined;
   const gpaScaleRaw = get("gpaScale");
   const gpaScale = gpaScaleRaw ? parseFloat(gpaScaleRaw) : undefined;
   return {
@@ -23,6 +25,7 @@ function buildProfile(sp: Record<string, string | string[] | undefined>): UserPr
     eduStatus: get("edu") ?? "",
     grade: Number(get("grade") ?? 0),
     gpa: Number.isFinite(gpa) ? gpa : undefined,
+    lastGpa: Number.isFinite(lastGpa) ? lastGpa : undefined,
     gpaScale: Number.isFinite(gpaScale) ? gpaScale : undefined,
     univ: get("univ") ?? "",
     gender: get("gender") ?? "",

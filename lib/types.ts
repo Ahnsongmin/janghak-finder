@@ -31,6 +31,9 @@ export interface Benefit {
   gpaScale?: number;
   /** 학력/재학상태 요건. 빈 배열이면 무관/미상 */
   eduStatus: string[];
+  /** 대상 대학 수준(예: ["4년제"], ["전문대"], ["대학원"]). KOSAF 대학구분에서 구조화.
+   *  미설정/빈 배열이면 무관. 사용자가 선택한 대학의 수준과 비교해 전문대 전용↔4년제 오노출을 막는다 */
+  univLevels?: string[];
   /** 해당 학년. 빈 배열이면 무관/미상 */
   grades: number[];
   /** 요구되는 특수자격(모두 충족해야 함, AND). 빈 배열이면 무관 */
@@ -80,7 +83,10 @@ export interface UserProfile {
   grade: number;
   /** 평점평균(사용자가 입력한 값). undefined = 미입력 */
   gpa?: number;
-  /** 사용자 평점의 만점 기준(4.5/4.3/4.0). 기본 4.5 */
+  /** 직전학기 평점(사용자가 입력한 값). undefined = 미입력.
+   *  '직전학기 성적 N 이상' 요건 장학금 매칭에 사용 — 전체 평점과 별개 조건이라 gpa로 대신하지 않는다 */
+  lastGpa?: number;
+  /** 사용자 평점의 만점 기준(4.5/4.3/4.0). 기본 4.5. gpa·lastGpa에 공통 적용 */
   gpaScale?: number;
   /** 선택한 대학명. "" 이면 미선택 */
   univ: string;

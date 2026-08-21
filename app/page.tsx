@@ -40,6 +40,7 @@ export default function Home() {
   const [grade, setGrade] = useState(0);
   const [gender, setGender] = useState("");
   const [gpa, setGpa] = useState("");
+  const [lastGpa, setLastGpa] = useState("");
   const [gpaScale, setGpaScale] = useState("4.5");
   const [univ, setUniv] = useState("");
   const [faculty, setFaculty] = useState("");
@@ -59,10 +60,9 @@ export default function Home() {
     if (eduStatus) p.set("edu", eduStatus);
     if (grade) p.set("grade", String(grade));
     if (gender) p.set("gender", gender);
-    if (gpa) {
-      p.set("gpa", gpa);
-      p.set("gpaScale", gpaScale);
-    }
+    if (gpa) p.set("gpa", gpa);
+    if (lastGpa) p.set("lastGpa", lastGpa);
+    if (gpa || lastGpa) p.set("gpaScale", gpaScale);
     if (univ) p.set("univ", univ);
     if (faculty) p.set("faculty", faculty);
     if (major) p.set("major", major);
@@ -283,7 +283,7 @@ export default function Home() {
                       className={fieldCls}
                       value={gpa}
                       onChange={(e) => setGpa(e.target.value)}
-                      placeholder="예: 3.75"
+                      placeholder="전체 평점 예: 3.75"
                     />
                     <select
                       className={fieldCls + " w-auto"}
@@ -298,6 +298,27 @@ export default function Home() {
                   </div>
                   <p className="mt-1.5 text-xs text-ink/40">
                     본인 학교 만점 기준 그대로 — 만점이 달라도 정확히 비교해요.
+                  </p>
+                </div>
+
+                <div>
+                  <label className={labelCls} htmlFor="lastGpa">
+                    직전학기 평점 <span className="font-normal text-ink/40">(선택)</span>
+                  </label>
+                  <input
+                    id="lastGpa"
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    min="0"
+                    max="4.5"
+                    className={fieldCls}
+                    value={lastGpa}
+                    onChange={(e) => setLastGpa(e.target.value)}
+                    placeholder="예: 3.9"
+                  />
+                  <p className="mt-1.5 text-xs text-ink/40">
+                    &lsquo;직전학기 성적 O.O 이상&rsquo;을 보는 장학금이 많아요. 만점 기준은 위와 동일하게 적용돼요.
                   </p>
                 </div>
 

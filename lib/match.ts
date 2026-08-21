@@ -1,5 +1,6 @@
 import type { Benefit, UserProfile, MatchResult, MatchStatus } from "./types";
 import { resolveFaculty } from "./faculty";
+import { univLevelOf } from "./univ-level";
 
 // 매칭 엔진.
 // 각 조건을 3-state로 판정한다: 통과(pass) / 불충족(fail) / 정보부족(unknown).
@@ -66,6 +67,13 @@ function inferIncomeCeiling(note: string): number | null {
   return null;
 }
 
+/** rawConditionText에서 특정 섹션([자격] 등) 줄만 추출 */
+function sectionLine(b: Benefit, tag: string): string {
+  return (
+    (b.rawConditionText ?? "").split("\n").find((l) => l.startsWith(`[${tag}]`)) ?? ""
+  );
+}
+
 function checkIncome(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
   if (b.incomeMax == null) {
     const note = b.incomeNote?.trim();
@@ -73,6 +81,15 @@ function checkIncome(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
       // 소득 조건 필드는 없지만 이름이 복지급여(생계·의료·주거·교육급여 등)면 수급자 전용 → 상위 소득 제외.
       if (WELFARE_NAME.test(b.name) && u.income >= 7) {
         return { v: "fail", msg: `수급자·저소득 전용 복지급여 — 소득 상위구간(${u.income}분위)은 대상 아님` };
+      }
+      // 소득 필드는 비었지만 [자격] 원문에 가계곤란·저소득 전용 신호가 있으면 상위 소득 제외.
+      // (예: "학자금 조달이 어려운 학생") 우대·가점은 비배타적이므로 제외하지 않는다.
+      const jagyeok = sectionLine(b, "자격");
+      if (u.income >= 7 && MEANS_TESTED.test(jagyeok) && !/우대|가점|가산|우선/.test(jagyeok)) {
+        return {
+          v: "fail",
+          msg: `가계곤란·저소득 대상(자격 요건) — 소득 상위구간(${u.income}분위)은 대상 아님`,
+        };
       }
       return { v: "pass", msg: "소득 조건 무관" };
     }
@@ -139,6 +156,74 @@ function checkGpa(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
     : { v: "fail", msg: `평점 미달 (요구: ${b.gpaMin}/${bScale} 만점 기준)` };
 }
 
+// ── 직전학기 성적 요건 ────────────────────────────────────────────────
+// 한국장학재단 등 원문 [성적] 항목의 '직전학기 평점 N 이상' 요건을 구조화해 비교한다.
+// 문자 등급(B+ 등)·백분위(80점 등)는 학교마다 환산이 달라 추측하지 않고 조건확인으로만 안내한다.
+// '직전 학기까지 누계 평점'은 전체 평점 조건이므로 여기서 다루지 않는다(오탐 방지).
+
+interface LastGpaPair {
+  min: number;
+  scale: number;
+}
+
+function extractLastGpaReq(b: Benefit): { pairs: LastGpaPair[]; excerpt: string } | null {
+  const raw = b.rawConditionText ?? "";
+  if (!raw.includes("[성적]")) return null;
+  const line = raw
+    .split("\n")
+    .find((l) => l.startsWith("[성적]") && /직전\s*학기/.test(l) && !/누계|누적/.test(l));
+  if (!line) return null;
+
+  // 이수학점 수치("12학점")는 평점과 무관 — 먼저 제거해 혼동 방지
+  const text = line.replace(/\d+\s*학점/g, "");
+  const pairs: LastGpaPair[] = [];
+
+  // "3.5/4.5" 형태: 기준/만점 쌍
+  for (const m of text.matchAll(/([0-4]\.\d{1,2})\s*(?:점)?\s*\/\s*(4\.[035])/g)) {
+    pairs.push({ min: Number(m[1]), scale: Number(m[2]) });
+  }
+  // "4.3만점은 2.6이상" 형태: 다른 만점 기준의 대체 요건
+  for (const m of text.matchAll(/(4\.[035])\s*(?:점\s*)?만점\s*(?:기준)?\s*은\s*([0-4]\.\d{1,2})/g)) {
+    pairs.push({ min: Number(m[2]), scale: Number(m[1]) });
+  }
+  // 주 기준: 위 쌍 표기를 걷어낸 뒤 "N.N 이상". 만점 언급이 있으면 그 만점, 없으면 4.5로 본다.
+  const cleaned = text
+    .replace(/([0-4]\.\d{1,2})\s*(?:점)?\s*\/\s*4\.[035]/g, "")
+    .replace(/4\.[035]\s*(?:점\s*)?만점\s*(?:기준)?\s*은\s*[0-4]\.\d{1,2}\s*(?:이상)?/g, "");
+  const scaleM = cleaned.match(/(4\.[035])\s*(?:점\s*)?만점/);
+  const main = cleaned
+    .replace(/4\.[035]\s*(?:점\s*)?만점/g, "")
+    .match(/([0-4]\.\d{1,2})[^\d\n]{0,8}이상/);
+  if (main) pairs.unshift({ min: Number(main[1]), scale: scaleM ? Number(scaleM[1]) : 4.5 });
+
+  const valid = pairs.filter((p) => p.min >= 0.5 && p.min <= p.scale);
+  const excerpt = line.replace(/^\[성적\]\s*/, "").slice(0, 60);
+  return { pairs: valid, excerpt };
+}
+
+function checkLastGpa(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
+  const req = extractLastGpaReq(b);
+  if (!req) return { v: "pass", msg: "직전학기 성적 조건 없음" };
+  // 수치화 못 하는 요건(문자 등급·백분위) — 환산 추측 없이 원문으로 확인 안내
+  if (req.pairs.length === 0) {
+    return { v: "unknown", msg: `직전학기 성적 조건: ${req.excerpt} — 성적표로 확인 필요` };
+  }
+  const uScale = u.gpaScale ?? 4.5;
+  // 사용자 만점 기준과 같은 요건이 있으면 그것을, 없으면 주 기준을 비율로 비교
+  const pair = req.pairs.find((p) => p.scale === uScale) ?? req.pairs[0];
+  if (u.lastGpa == null) {
+    return {
+      v: "unknown",
+      msg: `직전학기 평점 ${pair.min}/${pair.scale} 이상 대상 — 직전학기 성적 입력 시 확인`,
+    };
+  }
+  const need = pair.min / pair.scale;
+  const have = u.lastGpa / uScale;
+  return have >= need
+    ? { v: "pass", msg: `직전학기 평점 충족(${u.lastGpa}/${uScale} ≥ 요구 ${pair.min}/${pair.scale})` }
+    : { v: "fail", msg: `직전학기 평점 미달 (요구: ${pair.min}/${pair.scale} 만점 기준)` };
+}
+
 function checkFlags(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
   if (b.requiredFlags.length === 0) return { v: "pass", msg: "특수자격 무관" };
   const missing = b.requiredFlags.filter((f) => !u.flags.includes(f));
@@ -162,6 +247,18 @@ function univMatches(selected: string, target: string): boolean {
   const a = norm(selected);
   const b = norm(target);
   return !!a && !!b && (a === b || a.includes(b) || b.includes(a));
+}
+
+/** 대학 수준(4년제/전문대/대학원) 매칭 — 전문대 전용이 4년제 사용자에게(또는 반대로) 노출되는 것 방지 */
+function checkUnivLevel(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
+  const levels = (b.univLevels ?? []).filter((l) => l !== "특정대학"); // 특정대학은 대학명 매칭의 몫
+  if (levels.length === 0) return { v: "pass", msg: "대학 수준 무관" };
+  if (!u.univ) return { v: "pass", msg: "" }; // 대학 미선택 — 수준 미상(누락 방지)
+  const mine = univLevelOf(u.univ);
+  if (!mine) return { v: "pass", msg: "" };
+  return levels.includes(mine)
+    ? { v: "pass", msg: `대학 수준 해당(${mine})` }
+    : { v: "fail", msg: `${levels.join("·")} 재학생 대상 (내 대학: ${mine})` };
 }
 
 function checkUniversity(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
@@ -232,6 +329,11 @@ const EMPLOYEE_FAMILY = /자녀|자제|가족|배우자|직계/;
 // 자치구(구/군) 단위 거주 전용 — 시도만 입력한 사용자는 확인 불가(시도는 checkRegion이 처리).
 const SGG_RESIDENCE = /([가-힣]{2,4}[구군])\s*(?:에\s*)?(?:거주|주민등록|관내)/;
 
+// 예체능 전공 전용 신호 — "미술관련 학과", "음악 전공" 등. 학과구분 필드가 '제한없음'이라
+// faculties로 안 잡히고 [자격] 원문에만 적힌 경우를 보강한다.
+const ART_MAJOR_ONLY =
+  /(미술|음악|국악|체육|무용|디자인|연극|영화|예체능)[^\n]{0,4}(?:관련\s*)?(?:학과|전공|계열)/;
+
 function rawText(b: Benefit): string {
   return `${b.name} ${b.rawConditionText ?? ""} ${b.description ?? ""}`;
 }
@@ -263,7 +365,20 @@ function checkRawEligibility(b: Benefit, u: UserProfile): { v: Verdict; msg: str
     }
   }
 
-  // 4) 자치구(구/군) 거주 전용 — 시도만 입력한 사용자는 확인 필요(누락 방지로 제외하지 않음)
+  // 4) 예체능(미술·음악·체육 등) 전공 전용 — [자격] 원문 기반. 계열을 알면 판정, 모르면 확인.
+  //    '우대/가점'은 비배타적, '제외'는 반대 의미라 건드리지 않는다.
+  const jagyeok = sectionLine(b, "자격").replace(/[^\n]{0,10}(?:우대|가점|가산)/g, "");
+  const artM = jagyeok.match(ART_MAJOR_ONLY);
+  const artAfter = artM ? jagyeok.slice((artM.index ?? 0) + artM[0].length).slice(0, 6) : "";
+  if (artM && !artAfter.includes("제외")) {
+    const fac = resolveFaculty(u.faculty, u.major);
+    if (fac && fac !== "예체능계열") {
+      return { v: "fail", msg: `예체능(${artM[1]}) 전공 대상 — 내 계열(${fac})은 해당 없음` };
+    }
+    return { v: "unknown", msg: `예체능(${artM[1]}) 전공 대상 — 해당 시에만` };
+  }
+
+  // 5) 자치구(구/군) 거주 전용 — 시도만 입력한 사용자는 확인 필요(누락 방지로 제외하지 않음)
   const m = text.match(SGG_RESIDENCE);
   if (m) {
     return { v: "unknown", msg: `${m[1]} 거주자 대상 — 해당 자치구 거주 시에만` };
@@ -350,9 +465,11 @@ export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
     checkEdu(benefit, user),
     checkGrade(benefit, user),
     checkGpa(benefit, user),
+    checkLastGpa(benefit, user),
     checkFlags(benefit, user),
     checkTargetGroups(benefit, user),
     checkUniversity(benefit, user),
+    checkUnivLevel(benefit, user),
     checkDepartment(benefit, user),
     checkFaculty(benefit, user),
     checkGender(benefit, user),
