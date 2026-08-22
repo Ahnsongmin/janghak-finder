@@ -345,8 +345,13 @@ const SGG_RESIDENCE = /([가-힣]{1,4}[구군읍면])\s*(?:에|내)?[^\n]{0,12}?
 const MED_SCHOOL_ONLY =
   /(?:의과|한의과|치과|치의학|약학|수의과)\s*대학|(?:의학|한의학|치의학|약학)\s*전문\s*대학원/;
 
-// 백분위(100점 만점) 성적 요건 — 학교마다 환산이 달라 평점과 직접 비교할 수 없다
-const PERCENTILE_GRADE = /(\d{2,3})\s*점[^\n]{0,10}100\s*점\s*만점|100\s*점\s*만점[^\n]{0,10}(\d{2,3})\s*점/;
+// 백분위(100점 만점) 성적 요건 — 학교마다 환산이 달라 평점과 직접 비교할 수 없다.
+// "94점(100점 만점)", "백분위 85/100점", "백분위 성적 85점" 등 표기가 제각각이다.
+// "85/100점" 형태는 따로 먼저 본다. 한 정규식에 합치면 앞쪽의 '백분위'가 먼저 걸려
+// 분모인 100을 기준 점수로 잘못 집는다.
+const PERCENTILE_SLASH = /(\d{2,3})\s*점?\s*\/\s*100\s*점/;
+const PERCENTILE_GRADE =
+  /(\d{2,3})\s*점[^\n]{0,10}100\s*점\s*만점|100\s*점\s*만점[^\n]{0,10}(\d{2,3})\s*점|백분위[^\n]{0,12}?(\d{2,3})\s*점/;
 
 // 예체능 전공 전용 신호 — "미술관련 학과", "음악 전공" 등. 학과구분 필드가 '제한없음'이라
 // faculties로 안 잡히고 [자격] 원문에만 적힌 경우를 보강한다.
@@ -509,9 +514,10 @@ function checkRawEligibility(b: Benefit, u: UserProfile): { v: Verdict; msg: str
 
   // 1-1) 백분위·백분율 성적 요건 — 평점과 환산이 부정확해 단정하지 않고 확인으로 안내
   const seongjeok = sectionLine(b, "성적");
-  const pct = seongjeok.match(PERCENTILE_GRADE);
+  const pct = seongjeok.match(PERCENTILE_SLASH) ?? seongjeok.match(PERCENTILE_GRADE);
   if (pct) {
-    return { v: "unknown", msg: `백분위 성적 요건(${pct[1] ?? pct[2]}점/100점) — 환산 확인 필요` };
+    const score = pct.slice(1).find(Boolean);
+    return { v: "unknown", msg: `백분위 성적 요건(${score}점/100점) — 환산 확인 필요` };
   }
   if (PERCENT_OF_TOTAL.test(seongjeok)) {
     return { v: "unknown", msg: "백분율(총점 대비) 성적 요건 — 환산 확인 필요" };

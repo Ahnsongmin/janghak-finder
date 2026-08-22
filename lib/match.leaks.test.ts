@@ -398,6 +398,13 @@ describe("전수 감사 — 누수 유형별 고정", () => {
     expect(matchOne(b, user).status).toBe("review");
   });
 
+  it("'백분위 85/100점' 표기도 인식하고 기준 점수를 85로 읽는다(분모 100 아님)", () => {
+    const b = raw("[성적] 학업성적이 백분위 85/100점 이상");
+    const r = matchOne(b, user);
+    expect(r.status).toBe("review");
+    expect(r.unknown.some((m) => m.includes("85점/100점"))).toBe(true);
+  });
+
   it("자격 근거가 요약뿐인 복지로 항목은 '받을 수 있음'으로 올리지 않는다", () => {
     const b: Benefit = {
       ...base,
