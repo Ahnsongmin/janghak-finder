@@ -43,12 +43,24 @@ function asArray<T>(v: T | T[] | undefined): T[] {
   return Array.isArray(v) ? v : [v];
 }
 
-/** 시도명 정규화: 응답이 "서울" 처럼 줄여 줄 수 있어 우리 SIDO 표기로 맞춤 */
-function normalizeSido(ctpvNm?: string): string[] {
-  if (!ctpvNm || !ctpvNm.trim()) return ["전국"];
-  const raw = ctpvNm.trim();
+// 통합·약칭 표기에서 시도를 인식하기 위한 토큰 (예: "전남광주통합특별시" → 전남+광주)
+const SIDO_ABBR: [string, string][] = [
+  ["서울", "서울특별시"], ["부산", "부산광역시"], ["대구", "대구광역시"], ["인천", "인천광역시"],
+  ["광주", "광주광역시"], ["대전", "대전광역시"], ["울산", "울산광역시"], ["세종", "세종특별자치시"],
+  ["경기", "경기도"], ["강원", "강원특별자치도"], ["충북", "충청북도"], ["충남", "충청남도"],
+  ["전북", "전북특별자치도"], ["전남", "전라남도"], ["경북", "경상북도"], ["경남", "경상남도"],
+  ["제주", "제주특별자치도"],
+];
+
+/** 시도명 정규화. ctpvNm이 비면 담당부서명(예: "전남광주통합특별시 함평군 보건소")에서 추출.
+ *  통합 광역지자체 표기는 구성 시도 전체로 분해한다 — '전국' 오분류가 전국 사용자에게 새는 것 방지. */
+function normalizeSido(ctpvNm?: string, deptNm?: string): string[] {
+  const raw = (ctpvNm ?? "").trim() || (deptNm ?? "").trim();
+  if (!raw) return ["전국"];
   const exact = SIDO.find((s) => s === raw);
   if (exact) return [exact];
+  const found = [...new Set(SIDO_ABBR.filter(([t]) => raw.includes(t)).map(([, s]) => s))];
+  if (found.length) return found;
   const partial = SIDO.find((s) => s.startsWith(raw) || raw.startsWith(s.slice(0, 2)));
   return partial ? [partial] : ["전국"];
 }
@@ -108,7 +120,7 @@ function normalize(it: ServItem, kind: BokjiroKind, fetchedAt: string): Benefit 
     provider: it.jurMnofNm || it.bizChrDeptNm || (kind === "local" ? `${it.ctpvNm ?? ""} ${it.sggNm ?? ""}`.trim() : "정부") || "미상",
     sourceName: kind === "central" ? "복지로(중앙부처)" : "복지로(지자체)",
     description: it.servDgst?.trim() || undefined,
-    regions: kind === "central" ? ["전국"] : normalizeSido(it.ctpvNm),
+    regions: kind === "central" ? ["전국"] : normalizeSido(it.ctpvNm, it.bizChrDeptNm),
     incomeMax: null,
     incomeNote: incomeNoteFrom(it.trgterIndvdlNmArray),
     ageMin: ageMinFromLife(it.lifeNmArray),

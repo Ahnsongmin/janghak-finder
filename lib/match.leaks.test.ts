@@ -143,6 +143,67 @@ describe("대학 수준(univLevels) 매칭", () => {
   });
 });
 
+describe("2026-08-22 전수 감사에서 발견된 유형들", () => {
+  const base: Benefit = {
+    id: "test:audit",
+    name: "테스트 장학금",
+    category: "장학금",
+    provider: "테스트",
+    sourceName: "테스트",
+    regions: ["전국"],
+    incomeMax: null,
+    ageMin: null,
+    ageMax: null,
+    eduStatus: [],
+    grades: [],
+    requiredFlags: [],
+    targetGroups: [],
+  };
+
+  it("[자격] 외국인 대학(원)생 전용은 제외, '신청 가능' 확대 조항은 유지", () => {
+    const b1 = { ...base, rawConditionText: "[자격] 현재 국내 대학에 재학 중인 외국인 대학(원)생" };
+    expect(matchOne(b1, user).status).toBe("excluded");
+    const b2 = { ...base, rawConditionText: "[자격] 외국인 유학생(언어소통가능자) 신청가능 재학생 대상" };
+    expect(matchOne(b2, user).status).not.toBe("excluded");
+  });
+
+  it("[자격] 장애 학생 전용은 제외, '장애 학생은 성적기준 미적용' 예외 조항은 유지", () => {
+    const b1 = { ...base, rawConditionText: "[자격] 이공계열 학과 재학 중인 장애인 대학(원)생 (전공무관)" };
+    expect(matchOne(b1, user).status).toBe("excluded");
+    const b2 = { ...base, rawConditionText: "[자격] 재학생 (장애 학생은 성적기준 미적용)" };
+    expect(matchOne(b2, user).status).not.toBe("excluded");
+  });
+
+  it("[자격] 대학원 과정 전용은 학부생에게 제외, 학부 병행이면 유지", () => {
+    const b1 = { ...base, rawConditionText: "[자격] 대학원 석사·박사과정 재학 중인 자" };
+    expect(matchOne(b1, user).status).toBe("excluded");
+    const b2 = { ...base, rawConditionText: "[자격] 학부생 및 대학원 석사과정 재학생" };
+    expect(matchOne(b2, user).status).not.toBe("excluded");
+  });
+
+  it("이름이 여성 대상이면 남성 제외, 여성 사용자에겐 유지", () => {
+    const b = { ...base, name: "여성청소년 생리용품 지원" };
+    expect(matchOne(b, user).status).toBe("excluded");
+    expect(matchOne(b, { ...user, gender: "여성" }).status).not.toBe("excluded");
+  });
+
+  it("이름이 저소득층 대상 사업이면 10분위 제외", () => {
+    const b = { ...base, name: "저소득층 수도요금감면" };
+    expect(matchOne(b, user).status).toBe("excluded");
+  });
+
+  it("[요약]이 특정 시도 주민 대상이면 타지역 거주자 제외 (경남도민 → 서울 사용자)", () => {
+    const b = { ...base, rawConditionText: "[요약] 제도권 금융 이용이 어려운 취약 경남도민 대상으로 소액자금을 지원합니다." };
+    expect(matchOne(b, user).status).toBe("excluded");
+  });
+
+  it("이름이 보훈·유공자 대상이면 플래그 미보유 시 제외", () => {
+    const b = { ...base, name: "보훈원 양육지원" };
+    expect(matchOne(b, user).status).toBe("excluded");
+    expect(matchOne(b, { ...user, flags: ["국가보훈대상자"] }).status).not.toBe("excluded");
+  });
+});
+
 describe("[자격] 가계곤란 신호 — 우대는 제외 사유가 아님", () => {
   const base: Benefit = {
     id: "test:means",

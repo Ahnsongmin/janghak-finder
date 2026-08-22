@@ -68,9 +68,10 @@ def extract_regions(org: str, region_detail: str, special: str, is_regional: boo
             found.append(full)
     if found:
         return found
-    # 시군구명(주로 기관명에 등장)
+    # 시군구명(기관명 + 지역거주 원문 — "청양출신" 같은 연고 조건 포착)
+    org_region = org + " " + region_detail
     for sgg, sido in SGG_TO_SIDO.items():
-        if sgg in org and sido not in found:
+        if sgg in org_region and sido not in found:
             found.append(sido)
     if found:
         return found

@@ -82,6 +82,10 @@ function checkIncome(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
       if (WELFARE_NAME.test(b.name) && u.income >= 7) {
         return { v: "fail", msg: `수급자·저소득 전용 복지급여 — 소득 상위구간(${u.income}분위)은 대상 아님` };
       }
+      // 이름 자체가 저소득층 대상 사업(저소득층 요금감면 등) → 상위 소득 제외.
+      if (/저소득|차상위|기초생활|수급(?:자|권자|가구)/.test(b.name) && u.income >= 7) {
+        return { v: "fail", msg: `저소득층 대상 사업 — 소득 상위구간(${u.income}분위)은 대상 아님` };
+      }
       // 소득 필드는 비었지만 [자격] 원문에 가계곤란·저소득 전용 신호가 있으면 상위 소득 제외.
       // (예: "학자금 조달이 어려운 학생") 우대·가점은 비배타적이므로 제외하지 않는다.
       const jagyeok = sectionLine(b, "자격");
@@ -319,27 +323,58 @@ const SCHOOL_LEVEL_ONLY =
 const SCHOOL_LEVEL_OK = /대학|신입생|재학생/;
 
 // 의·약학 등 전문 연구자/학술 논문 지원 (학부생, 특히 비(非)의약 계열엔 해당 없음).
-const MED_RESEARCH = /(?:의\/?약학|의학|약학|치의학|한의학|수의학)\s*(?:연구자|연구|학술|학회)|학술\s*부문\s*(?:각?\s*\d+\s*편|논문)/;
+const MED_RESEARCH =
+  /(?:의\/?약학|의학|약학|치의학|한의학|수의학)\s*(?:연구자|연구|학술|학회)|학술\s*부문\s*(?:각?\s*\d+\s*편|논문)|연구[^\n]{0,30}(?:의학|약학|치의학|한의학|수의학)/;
 
 // 특정 직군 '재직자/연금적용' 전용. 자녀·가족 동반 여부로 fail↔review 분기.
 const EMPLOYEE_ONLY =
-  /사립학교교직원연금|공무원연금[^\n]{0,6}적용|군인연금[^\n]{0,6}적용|재직\s*(?:중인\s*)?(?:교직원|교원|임직원|직원|근로자|교사|공무원)|(?:현직|재직)\s*(?:교사|교수|공무원|군인|경찰|소방관?)/;
+  /사립학교교직원연금|공무원연금[^\n]{0,6}적용|군인연금[^\n]{0,6}적용|재직\s*(?:중인\s*)?(?:교직원|교원|임직원|직원|근로자|교사|공무원)|(?:현직|재직)\s*(?:교사|교수|공무원|군인|경찰|소방관?)|(?:소방|경찰|교정|관세)\s*공무원|공무원[^\n]{0,15}(?:근속|재직|복무)/;
 const EMPLOYEE_FAMILY = /자녀|자제|가족|배우자|직계/;
 
 // 자치구(구/군) 단위 거주 전용 — 시도만 입력한 사용자는 확인 불가(시도는 checkRegion이 처리).
-const SGG_RESIDENCE = /([가-힣]{2,4}[구군])\s*(?:에\s*)?(?:거주|주민등록|관내)/;
+const SGG_RESIDENCE = /([가-힣]{2,4}[구군읍면])\s*(?:에|내)?[^\n]{0,12}?(?:거주|주민등록|관내|주소)/;
 
 // 예체능 전공 전용 신호 — "미술관련 학과", "음악 전공" 등. 학과구분 필드가 '제한없음'이라
 // faculties로 안 잡히고 [자격] 원문에만 적힌 경우를 보강한다.
 const ART_MAJOR_ONLY =
-  /(미술|음악|국악|체육|무용|디자인|연극|영화|예체능)[^\n]{0,4}(?:관련\s*)?(?:학과|전공|계열)/;
+  /(미술|음악|국악|체육|무용|디자인|연극|영화|예체능)[^\n]{0,10}(?:관련\s*)?(?:학과|전공|계열|대학)/;
+
+// 대학원(석·박사) 과정 전용 — 학부 신호가 함께 없을 때만. (eduStatus 구조화를 못 탄 원문 전용 케이스)
+const GRAD_ONLY = /(?:석사|박사|석·박사|석\/박사|대학원)[^\n]{0,12}(?:과정|재학|진학|신입생|학위)/;
+const UNDERGRAD_OK = /학부|학사|대학생/;
+
+// 장애 학생 전용 — "재학중인 장애학생/시각장애인/정신장애를 가진" 등.
+// '장애 학생은 성적기준 미적용' 같은 예외 조항(장애 인접 문구)은 전용이 아니다.
+const DISABILITY_ONLY =
+  /(?:시각|청각|지체|발달|중증|정신)?\s*장애(?:인|학생|\s*학생|\s*대학생)|장애를\s*가진/;
+const DISAB_NOT_EXCLUSIVE = /장애[^\n]{0,14}(?:미적용|면제|예외)/;
+
+// 외국인·개발도상국 유학생 전용 (뒤에 '신청 가능/포함' 류가 붙으면 확대 조항이라 전용 아님)
+const INTL_STUDENT_ONLY = /(?:외국인|개발도상국[^\n]{0,6}(?:출신)?의?)\s*(?:유학생|대학(?:\(원\))?생|재학생)/;
+
+// 특정 종교·교단 관련 대상 (신학생, 목회자·선교사 자녀, 특정 교단·교회 등록 등) — 확인으로 분리
+const RELIGIOUS_ONLY =
+  /신학과|신학생|목회자|선교사\s*자녀|승려|수녀|교단|감리교|장로교|천주교|불교\s*신자|기독교인|정교인|목장교회|교회\s*(?:등록|출석)|세례\s*(?:교인|받은)/;
+
+// 특정 단체 회원·조합원(자녀) 전용 — 확인으로 분리
+const MEMBER_ONLY = /회원\s*가입\s*기간|(?:회원|조합원)[^\n]{0,12}자녀|조합원\s*본인/;
+
+// 자립준비청년(보호종료)·고립은둔·가족돌봄 청년 등 특수 상황 청년 대상 — 확인으로 분리
+const SPECIAL_YOUTH = /자립준비청년|보호종료|고립[·\s]?은둔|가족돌봄청년/;
+
+// 시험 준비생(수험생) 대상, 기존 선발 장학생 계속 지원 — 확인으로 분리
+const EXAM_TAKER = /수험\s*생활|수험생/;
+const EXISTING_SCHOLAR = /\d+\s*기에?\s*해당하는\s*장학생|기존\s*장학생/;
+
+// "X관련학과" 전공 제한 — 사용자의 학과와 느슨 비교(불일치 시 확인으로 분리, 분류가 애매해 제외는 안 함)
+const MAJOR_RESTRICT = /([가-힣]{2,8})\s*관련\s*학과/;
 
 // 사고·순직 유자녀/유족 전용 — 해당 신분은 선택지(플래그)로 표현 불가한 특수 전용.
 // 문중·종친회 전용과 같은 원칙: 해당자는 이미 그 재단을 알고 있으므로 일반 사용자에겐 제외.
 const BEREAVED_ONLY = /유자녀|유가족|유족(?!회)|(?:사망|순직)(?:한|하신)?\s*(?:자|분|사람)?의?\s*자녀/;
 
 // "OO 소재 대학(교) 재학생" — 거주지가 아닌 '학교 소재지' 조건. 사용자의 대학 소재 시도와 비교.
-const UNIV_LOCATION = /([가-힣]{2,12})\s*소재\s*(?:의\s*)?대학/;
+const UNIV_LOCATION = /([가-힣]{2,12})\s*소재(?:한|의)?\s*대학/;
 // 소재지 문자열에서 시도를 인식하기 위한 약칭 → 시도 (예: "광주전남통합특별시" → 광주+전남)
 const SIDO_TOKENS: [string, string][] = [
   ["서울", "서울특별시"], ["부산", "부산광역시"], ["대구", "대구광역시"], ["인천", "인천광역시"],
@@ -404,6 +439,55 @@ function checkRawEligibility(b: Benefit, u: UserProfile): { v: Verdict; msg: str
       : { v: "fail", msg: "사고·순직 유자녀·유족 전용 — 해당 없음" };
   }
 
+  // 5-1) 대학원(석·박사) 과정 전용 — [자격]에 학부 신호 없이 대학원 과정만 요구하는 경우
+  if (GRAD_ONLY.test(jagyeok) && !UNDERGRAD_OK.test(jagyeok) && u.eduStatus !== "대학원생") {
+    if (u.eduStatus) return { v: "fail", msg: "대학원(석·박사) 과정 전용 — 학부생은 해당 없음" };
+    return { v: "unknown", msg: "대학원(석·박사) 과정 대상 — 해당 시에만" };
+  }
+
+  // 5-2) 장애 학생 전용 — 플래그 미보유 시 제외. '미적용·면제' 등 예외 조항 문구는 전용이 아님
+  if (
+    DISABILITY_ONLY.test(jagyeok) &&
+    !DISAB_NOT_EXCLUSIVE.test(jagyeok) &&
+    !u.flags.includes("장애인(본인/가족)")
+  ) {
+    return { v: "fail", msg: "장애 학생 대상 — 해당 없음(특수자격 미선택)" };
+  }
+
+  // 5-3) 외국인·개발도상국 유학생 전용 — '신청 가능/포함' 류 확대 조항이면 전용 아님
+  const intlM = jagyeok.match(INTL_STUDENT_ONLY);
+  if (intlM) {
+    const after = jagyeok.slice((intlM.index ?? 0) + intlM[0].length).slice(0, 20);
+    if (!/신청\s*가능|지원\s*가능|포함/.test(after)) {
+      return { v: "fail", msg: "외국인 유학생 대상 — 해당 없음" };
+    }
+  }
+
+  // 5-4) 특정 종교·교단 / 단체 회원 관련 대상 — 해당 여부를 알 수 없어 확인으로 분리
+  if (RELIGIOUS_ONLY.test(jagyeok)) {
+    return { v: "unknown", msg: "특정 종교·교단 관련 대상 — 해당 시에만" };
+  }
+  if (MEMBER_ONLY.test(jagyeok)) {
+    return { v: "unknown", msg: "특정 단체 회원·조합원(자녀) 대상 — 해당 시에만" };
+  }
+
+  // 5-5) 특수 상황 청년(자립준비·고립은둔·가족돌봄)·수험생·기존 장학생 계속지원 — 확인으로 분리
+  if (SPECIAL_YOUTH.test(`${b.name} ${jagyeok}`)) {
+    return { v: "unknown", msg: "자립준비·고립은둔·가족돌봄 청년 대상 — 해당 시에만" };
+  }
+  if (EXAM_TAKER.test(jagyeok)) {
+    return { v: "unknown", msg: "시험 준비생(수험생) 대상 — 해당 시에만" };
+  }
+  if (EXISTING_SCHOLAR.test(jagyeok)) {
+    return { v: "unknown", msg: "기존 선발 장학생(계속 지원) 대상 — 해당 시에만" };
+  }
+
+  // 5-6) "X관련학과" 전공 제한 — 입력한 학과와 안 맞으면 확인으로 분리(분류가 애매해 제외는 안 함)
+  const mjr = jagyeok.match(MAJOR_RESTRICT);
+  if (mjr && u.major && !majorMatches(u.major, mjr[1])) {
+    return { v: "unknown", msg: `${mjr[1]} 관련 학과 대상 — 해당 시에만` };
+  }
+
   // 6) 자치구(구/군) 거주 전용 — 시도만 입력한 사용자는 확인 필요(누락 방지로 제외하지 않음)
   const m = text.match(SGG_RESIDENCE);
   if (m) {
@@ -417,6 +501,13 @@ function checkRawEligibility(b: Benefit, u: UserProfile): { v: Verdict; msg: str
  *  국내/전국 소재는 조건이 아니고, 시군 단위(예: "아산시 소재")는 시도 판별이 안 되므로 확인으로만 안내. */
 function checkUnivLocation(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
   const src = `${sectionLine(b, "자격")} ${sectionLine(b, "지역거주")}`;
+  // "수도권을 제외한 지역 소재 대학" — 수도권(서울·인천·경기) 대학 사용자는 제외
+  if (/수도권(?:을|은)?\s*제외/.test(src) && u.univ) {
+    const myRegion = univRegionOf(u.univ);
+    if (myRegion && ["서울특별시", "인천광역시", "경기도"].includes(myRegion)) {
+      return { v: "fail", msg: `수도권 제외 지역 대학 대상 (내 대학 소재: ${myRegion})` };
+    }
+  }
   const m = src.match(UNIV_LOCATION);
   if (!m) return { v: "pass", msg: "" };
   const loc = m[1];
@@ -469,6 +560,10 @@ function checkLifeStageGender(b: Benefit, u: UserProfile): { v: Verdict; msg: st
   if (/여성긴급|위기여성|미혼모|여성\s*전용|성매매[^\n]{0,6}피해|여성[^\n]{0,4}쉼터/.test(text) && u.gender === "남성") {
     return { v: "fail", msg: "여성 대상 지원 — 남성은 해당 없음" };
   }
+  // 2-1) 이름이 여성 대상인 사업(여성청소년·여성어업인·여성기업 등) — 남성 제외
+  if (/(?<!부)여성|여대생/.test(name) && u.gender === "남성" && !ACADEMIC_GUARD.test(name)) {
+    return { v: "fail", msg: "여성 대상 지원 — 남성은 해당 없음" };
+  }
 
   // 3) 플래그 매핑 집단 — 해당 플래그 미보유 시 제외 (이름 기반 강한 신호 + 학과 가드)
   const has = (f: string) => u.flags.includes(f);
@@ -481,16 +576,53 @@ function checkLifeStageGender(b: Benefit, u: UserProfile): { v: Verdict; msg: st
   if (/다문화/.test(name) && !has("다문화가족") && !ACADEMIC_GUARD.test(name)) {
     return { v: "fail", msg: "다문화가족 대상 — 해당 없음(특수자격 미선택)" };
   }
-  if (/장애인|장애아|장애\s*대학생|중증장애|발달장애/.test(name) && !has("장애인(본인/가족)") && !ACADEMIC_GUARD.test(name)) {
+  if (/장애인|장애아|장애\s*대학생|장애학생|장애입양|중증장애|발달장애|장애수당|경증장애/.test(name) && !has("장애인(본인/가족)") && !ACADEMIC_GUARD.test(name)) {
     return { v: "fail", msg: "장애인 대상 — 해당 없음(특수자격 미선택)" };
   }
   if (/한부모|미혼모|조손\s*가정|모자가정|부자가정/.test(name) && !has("한부모가족")) {
     return { v: "fail", msg: "한부모·조손가정 대상 — 해당 없음(특수자격 미선택)" };
   }
 
-  // 4) 노인·고령 — 젊은 사용자면 제외 (학과/요양보호사 양성 등은 가드로 제외)
-  if (/노인|어르신|고령자?|경로(?:당|우대)|65세\s*이상|장기요양|치매/.test(name) && youngUser(u) && !ACADEMIC_GUARD.test(name)) {
-    return { v: "fail", msg: "노인·고령자 대상 — 대학생은 해당 없음" };
+  // 3-1) 이름·요약이 보훈·유공자 대상 — 보훈 플래그 미보유 시 제외
+  const yoyak = sectionLine(b, "요약");
+  if (/보훈|유공자|참전/.test(name) && !has("국가보훈대상자")) {
+    return { v: "fail", msg: "국가보훈대상자·유공자 대상 — 해당 없음(특수자격 미선택)" };
+  }
+  if (/유공자|보훈보상|참전/.test(yoyak) && !has("국가보훈대상자")) {
+    return { v: "fail", msg: "국가보훈대상자·유공자 대상 — 해당 없음(특수자격 미선택)" };
+  }
+  // 3-1-1) 요약이 특정 시도 주민(도민·시민) 대상인데 거주지가 다르면 제외 (예: "취약 경남도민 대상")
+  const resM = yoyak.match(/([가-힣]{2,4})(?:도민|시민|군민)/);
+  if (resM && u.region) {
+    const target = SIDO_TOKENS.filter(([t]) => resM[1].includes(t)).map(([, s]) => s);
+    if (target.length > 0 && !target.includes(u.region)) {
+      return { v: "fail", msg: `${resM[1]} 지역 주민 대상 (내 거주지: ${u.region})` };
+    }
+  }
+  // 3-2) 직업군 전용 사업(농어업인·소상공인·자영업 등) — 학생에겐 제외
+  if (/농업인(?!재)|어업인(?!재)|임업인|축산농|귀농|귀어|소상공인|자영업/.test(name) && youngUser(u)) {
+    return { v: "fail", msg: "농어업인·소상공인 등 직업군 대상 — 대학생은 해당 없음" };
+  }
+  // 3-3) 장기복무 제대군인(10년 이상 복무) 대상 — 대학생에겐 제외. 일반 제대군인은 확인으로만(복학생 가능)
+  if (/장기복무[^\n]{0,4}제대군인/.test(name) && youngUser(u)) {
+    return { v: "fail", msg: "장기복무 제대군인 대상 — 해당 없음" };
+  }
+  if (/제대군인/.test(name)) {
+    return { v: "unknown", msg: "제대군인 대상 — 해당 시에만" };
+  }
+  // 3-4) 산재·일반 근로자 대상 사업 — 재직·근로 중인 경우만 해당(근로장학은 제외 대상 아님)
+  if (/산재근로자|산재\s*보험/.test(name) || (/근로자/.test(name) && !/장학/.test(name))) {
+    return { v: "unknown", msg: "근로자(재직·산재 등) 대상 — 해당 시에만" };
+  }
+
+  // 4) 노인·고령·중장년 — 젊은 사용자면 제외 (학과/요양보호사 양성 등은 가드로 제외)
+  if (/노인|어르신|고령자?|경로(?:당|우대)|65세\s*이상|장기요양|치매|중장년/.test(name) && youngUser(u) && !ACADEMIC_GUARD.test(name)) {
+    return { v: "fail", msg: "노인·중장년 등 고연령 대상 — 대학생은 해당 없음" };
+  }
+
+  // 4-1) 초·중·고 학생(자녀) 가구 대상(입학지원금·교복 등) — 부모일 수 있어 확인으로만
+  if (/초등학생|중고교생|중·고교|교복/.test(name) && youngUser(u) && !ACADEMIC_GUARD.test(name)) {
+    return { v: "unknown", msg: "초·중·고 학생(자녀) 가구 대상 — 해당 시에만" };
   }
 
   // 5) 영유아·아동(수령 대상이 아동) — 학생-부모 가능성으로 조건확인
