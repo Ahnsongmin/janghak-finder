@@ -49,6 +49,57 @@ describe("신고된 오노출 — 일반 학부생에게 제외돼야 하는 것
     expect(r.failed.some((m) => /예체능/.test(m))).toBe(true);
   });
 
+  it("고속도로장학재단(사고 유자녀·유족 전용)은 일반 사용자에게 제외, 관련 플래그 보유자에겐 확인", () => {
+    const items = getBenefits().filter((b) => b.provider.includes("고속도로장학재단"));
+    expect(items.length).toBeGreaterThan(0);
+    for (const b of items) {
+      expect(matchOne(b, user).status, b.name).toBe("excluded");
+      // 장애인(본인/가족) 플래그 보유자에겐 '조건확인'으로 남아야 함(누락 방지)
+      const withFlag = { ...user, flags: ["장애인(본인/가족)"] };
+      expect(matchOne(b, withFlag).status, `${b.name} (장애 플래그)`).not.toBe("excluded");
+    }
+  });
+
+  it("지역공부방 장학금(광주전남 소재 대학)은 서강대(서울) 사용자에게 제외", () => {
+    const b = findByName("지역공부방", "한국인터넷진흥원");
+    expect(b, "데이터에 지역공부방 장학금 존재").toBeTruthy();
+    const r = matchOne(b!, user);
+    expect(r.status).toBe("excluded");
+  });
+
+  it("유희춘장학생('어려운 가정환경' 요건)은 10분위 제외, 5분위는 유지", () => {
+    const b = findByName("유희춘", "천정");
+    expect(b, "데이터에 유희춘장학생 존재").toBeTruthy();
+    expect(matchOne(b!, user).status).toBe("excluded");
+    expect(matchOne(b!, { ...user, income: 5 }).status).not.toBe("excluded");
+  });
+
+  it("'OO 소재 대학'이 내 대학 소재지와 일치하면 제외되지 않는다", () => {
+    const base: Benefit = {
+      id: "test:loc",
+      name: "테스트 장학금",
+      category: "장학금",
+      provider: "테스트",
+      sourceName: "테스트",
+      regions: ["전국"],
+      incomeMax: null,
+      ageMin: null,
+      ageMax: null,
+      eduStatus: [],
+      grades: [],
+      requiredFlags: [],
+      targetGroups: [],
+      rawConditionText: "[자격] 서울 소재 대학교 재학생",
+    };
+    expect(matchOne(base, user).status).not.toBe("excluded");
+    // 수도권 소재도 서울 대학이면 통과
+    const sudo = { ...base, rawConditionText: "[자격] 수도권 소재 대학교 재학생" };
+    expect(matchOne(sudo, user).status).not.toBe("excluded");
+    // 시군 단위(시도 판별 불가)는 제외하지 않고 확인으로만
+    const sgg = { ...base, rawConditionText: "[자격] 아산시 소재 대학교 재학생" };
+    expect(matchOne(sgg, user).status).not.toBe("excluded");
+  });
+
   it("대학원생 전용(eduStatus)이 재학 학부생에게 새지 않는다 — 전수 검사", () => {
     const gradOnly = getBenefits().filter(
       (b) => b.eduStatus.length > 0 && !b.eduStatus.includes("대학생(재학)") && b.eduStatus.includes("대학원생"),

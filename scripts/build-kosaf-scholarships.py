@@ -60,6 +60,9 @@ def extract_regions(org: str, region_detail: str, special: str, is_regional: boo
     못 찾으면 지역연고형은 [](미상=확인필요), 그 외(민간·공공)는 ['전국']."""
     blob = " ".join([org, region_detail, special])
     found = []
+    # 통합 광역지자체 표기(예: '광주전남통합특별시')는 구성 시도 전체로 분해
+    if "광주전남" in blob:
+        found += ["광주광역시", "전라남도"]
     for full in SIDO_FULL:
         if full in blob and full not in found:
             found.append(full)

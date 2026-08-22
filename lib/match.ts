@@ -1,6 +1,6 @@
 import type { Benefit, UserProfile, MatchResult, MatchStatus } from "./types";
 import { resolveFaculty } from "./faculty";
-import { univLevelOf } from "./univ-level";
+import { univLevelOf, univRegionOf } from "./univ-level";
 
 // 매칭 엔진.
 // 각 조건을 3-state로 판정한다: 통과(pass) / 불충족(fail) / 정보부족(unknown).
@@ -23,7 +23,7 @@ function checkRegion(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
 // 가계곤란/저소득·복지 연계(소득 심사형) 신호 — 명시 구간이 없어도 상위 소득은 사실상 제외.
 // 복지급여(생계·의료·주거·교육)/수급가구/차상위/한부모/긴급복지/소득인정액 등 폭넓게 포착.
 const MEANS_TESTED =
-  /가계\s*곤란|저소득|소득\s*심사|가(?:정|계)\s*형편|형편이?\s*어려|생활\s*곤란|생활이?\s*곤란|생활환경[^\n]{0,4}어려|경제적[^\n]{0,4}어려|학비\s*조달|학자금\s*조달|기초\s*생활|국민기초|기초수급|수급\s*(?:가구|자|권자|세대)|복지\s*급여|생계\s*급여|의료\s*급여|주거\s*급여|교육\s*급여|차상위|한부모|긴급\s*복지|소득\s*인정액|법정\s*저소득|기초연금|(?:소득|가계소득|소득구간|지원구간|소득분위)[^\n]{0,4}낮/;
+  /가계\s*곤란|저소득|소득\s*심사|가(?:정|계)\s*형편|형편이?\s*어려|생활\s*곤란|생활이?\s*곤란|생활환경[^\n]{0,4}어려|경제적[^\n]{0,4}어려|어려운\s*(?:가정|가계|생활|형편)|가정\s*환경[^\n]{0,6}어려|학비\s*조달|학자금\s*조달|기초\s*생활|국민기초|기초수급|수급\s*(?:가구|자|권자|세대)|복지\s*급여|생계\s*급여|의료\s*급여|주거\s*급여|교육\s*급여|차상위|한부모|긴급\s*복지|소득\s*인정액|법정\s*저소득|기초연금|(?:소득|가계소득|소득구간|지원구간|소득분위)[^\n]{0,4}낮/;
 
 // 이름 자체가 수급자·저소득 전용 복지급여 프로그램인 신호 — 소득 필드가 비어 있어도 상위 소득은 제외.
 // (이름 기반이라 '수급자 우대' 정도만 언급하는 일반 지원사업/장학금을 오탐하지 않는다)
@@ -334,6 +334,22 @@ const SGG_RESIDENCE = /([가-힣]{2,4}[구군])\s*(?:에\s*)?(?:거주|주민등
 const ART_MAJOR_ONLY =
   /(미술|음악|국악|체육|무용|디자인|연극|영화|예체능)[^\n]{0,4}(?:관련\s*)?(?:학과|전공|계열)/;
 
+// 사고·순직 유자녀/유족 전용 — 해당 신분은 선택지(플래그)로 표현 불가한 특수 전용.
+// 문중·종친회 전용과 같은 원칙: 해당자는 이미 그 재단을 알고 있으므로 일반 사용자에겐 제외.
+const BEREAVED_ONLY = /유자녀|유가족|유족(?!회)|(?:사망|순직)(?:한|하신)?\s*(?:자|분|사람)?의?\s*자녀/;
+
+// "OO 소재 대학(교) 재학생" — 거주지가 아닌 '학교 소재지' 조건. 사용자의 대학 소재 시도와 비교.
+const UNIV_LOCATION = /([가-힣]{2,12})\s*소재\s*(?:의\s*)?대학/;
+// 소재지 문자열에서 시도를 인식하기 위한 약칭 → 시도 (예: "광주전남통합특별시" → 광주+전남)
+const SIDO_TOKENS: [string, string][] = [
+  ["서울", "서울특별시"], ["부산", "부산광역시"], ["대구", "대구광역시"], ["인천", "인천광역시"],
+  ["광주", "광주광역시"], ["대전", "대전광역시"], ["울산", "울산광역시"], ["세종", "세종특별자치시"],
+  ["경기", "경기도"], ["강원", "강원특별자치도"], ["충북", "충청북도"], ["충청북", "충청북도"],
+  ["충남", "충청남도"], ["충청남", "충청남도"], ["전북", "전북특별자치도"], ["전라북", "전북특별자치도"],
+  ["전남", "전라남도"], ["전라남", "전라남도"], ["경북", "경상북도"], ["경상북", "경상북도"],
+  ["경남", "경상남도"], ["경상남", "경상남도"], ["제주", "제주특별자치도"],
+];
+
 function rawText(b: Benefit): string {
   return `${b.name} ${b.rawConditionText ?? ""} ${b.description ?? ""}`;
 }
@@ -378,13 +394,50 @@ function checkRawEligibility(b: Benefit, u: UserProfile): { v: Verdict; msg: str
     return { v: "unknown", msg: `예체능(${artM[1]}) 전공 대상 — 해당 시에만` };
   }
 
-  // 5) 자치구(구/군) 거주 전용 — 시도만 입력한 사용자는 확인 필요(누락 방지로 제외하지 않음)
+  // 5) 사고·순직 유자녀/유족 전용 — 보훈·장애 플래그 보유자에겐 확인으로, 그 외엔 제외
+  if (BEREAVED_ONLY.test(jagyeok)) {
+    const related =
+      u.flags.includes("국가보훈대상자") ||
+      (u.flags.includes("장애인(본인/가족)") && /장애/.test(jagyeok));
+    return related
+      ? { v: "unknown", msg: "사고·순직 유자녀 등 유족 대상 — 해당 시에만" }
+      : { v: "fail", msg: "사고·순직 유자녀·유족 전용 — 해당 없음" };
+  }
+
+  // 6) 자치구(구/군) 거주 전용 — 시도만 입력한 사용자는 확인 필요(누락 방지로 제외하지 않음)
   const m = text.match(SGG_RESIDENCE);
   if (m) {
     return { v: "unknown", msg: `${m[1]} 거주자 대상 — 해당 자치구 거주 시에만` };
   }
 
   return { v: "pass", msg: "추가 자격조건 없음" };
+}
+
+/** "OO 소재 대학 재학생" — 학교 소재지 조건. 사용자가 선택한 대학의 소재 시도와 비교한다.
+ *  국내/전국 소재는 조건이 아니고, 시군 단위(예: "아산시 소재")는 시도 판별이 안 되므로 확인으로만 안내. */
+function checkUnivLocation(b: Benefit, u: UserProfile): { v: Verdict; msg: string } {
+  const src = `${sectionLine(b, "자격")} ${sectionLine(b, "지역거주")}`;
+  const m = src.match(UNIV_LOCATION);
+  if (!m) return { v: "pass", msg: "" };
+  const loc = m[1];
+  if (/국내|국외|해외|외국|전국/.test(loc)) return { v: "pass", msg: "" };
+  // 수도권 = 서울·인천·경기
+  const mentioned = /수도권/.test(loc)
+    ? ["서울특별시", "인천광역시", "경기도"]
+    : [...new Set(SIDO_TOKENS.filter(([tok]) => loc.includes(tok)).map(([, sido]) => sido))];
+  if (mentioned.length === 0) {
+    return { v: "unknown", msg: `${loc} 소재 대학 재학생 대상 — 해당 시에만` };
+  }
+  if (!u.univ) {
+    return { v: "unknown", msg: `${loc} 소재 대학 재학생 대상 — 대학 선택 시 확인` };
+  }
+  const myRegion = univRegionOf(u.univ);
+  if (!myRegion) {
+    return { v: "unknown", msg: `${loc} 소재 대학 재학생 대상 — 해당 시에만` };
+  }
+  return mentioned.includes(myRegion)
+    ? { v: "pass", msg: `대학 소재지 해당(${myRegion})` }
+    : { v: "fail", msg: `${loc} 소재 대학 재학생 대상 (내 대학 소재: ${myRegion})` };
 }
 
 // ── 성별·생애주기 게이팅 ────────────────────────────────────────────────
@@ -470,6 +523,7 @@ export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
     checkTargetGroups(benefit, user),
     checkUniversity(benefit, user),
     checkUnivLevel(benefit, user),
+    checkUnivLocation(benefit, user),
     checkDepartment(benefit, user),
     checkFaculty(benefit, user),
     checkGender(benefit, user),
