@@ -264,4 +264,163 @@ describe("[자격] 가계곤란 신호 — 우대는 제외 사유가 아님", (
     expect(matchOne(b, user).status).toBe("excluded");
     expect(matchOne(b, { ...user, income: 5 }).status).not.toBe("excluded");
   });
+
+  it("'가정환경이 어렵지만'처럼 '어렵-'으로 끝나는 표기도 10분위 제외", () => {
+    const b = { ...base, rawConditionText: "[자격] 가정환경이 어렵지만 학업 성적이 우수한 학생" };
+    expect(matchOne(b, user).status).toBe("excluded");
+  });
+});
+
+// 2026-08-22 심야 전수 감사에서 드러난 누수 유형별 회귀 테스트.
+// 개별 장학금이 아니라 '유형'을 고정한다 — 데이터가 매달 바뀌어도 규칙이 살아 있는지 검증.
+describe("전수 감사 — 누수 유형별 고정", () => {
+  const base: Benefit = {
+    id: "test:audit",
+    name: "테스트 장학금",
+    category: "장학금",
+    provider: "테스트재단",
+    sourceName: "테스트",
+    regions: ["전국"],
+    incomeMax: null,
+    ageMin: null,
+    ageMax: null,
+    eduStatus: [],
+    grades: [],
+    requiredFlags: [],
+    targetGroups: [],
+  };
+  const raw = (t: string): Benefit => ({ ...base, rawConditionText: t });
+
+  it("학년 지정(1학년 재학생)은 2학년에게 제외, 1학년에겐 유지", () => {
+    const b = raw("[자격] 현재 학부 1학년에 재학중인 학생");
+    expect(matchOne(b, user).status).toBe("excluded");
+    expect(matchOne(b, { ...user, grade: 1 }).status).not.toBe("excluded");
+  });
+
+  it("학년 범위(2~3학년)는 2학년에게 유지, 4학년에겐 제외", () => {
+    const b = raw("[자격] 이공계대학의 2~3학년 재학생");
+    expect(matchOne(b, user).status).not.toBe("excluded");
+    expect(matchOne(b, { ...user, grade: 4 }).status).toBe("excluded");
+  });
+
+  it("연도 표기(2025~2026학년도)를 학년 범위로 오독하지 않는다", () => {
+    const b = raw("[자격] 2025~2026학년도 정규 등록 학부 재학생");
+    expect(matchOne(b, user).status).not.toBe("excluded");
+  });
+
+  it("나열된 학년(2·3·4학년)은 모두 대상으로 인정한다", () => {
+    expect(matchOne(raw("[자격] 대학교 2·3·4학년 재학생"), user).status).not.toBe("excluded");
+    expect(matchOne(raw("[자격] 대학교 2/3/4학년 재학생"), user).status).not.toBe("excluded");
+    expect(matchOne(raw("[자격] 대학교 3·4학년 재학생"), user).status).toBe("excluded");
+  });
+
+  it("'3학년 진학 예정자'의 대상은 지금 2학년인 학생이다", () => {
+    const b = raw("[자격] 2026학년도 1학기에 3학년 1학기 진학 예정자");
+    expect(matchOne(b, user).status).not.toBe("excluded");
+    expect(matchOne(b, { ...user, grade: 4 }).status).toBe("excluded");
+  });
+
+  it("'학년 제한 없음, 졸업예정자 제외'를 졸업반 전용으로 뒤집어 읽지 않는다", () => {
+    const b = raw("[자격] 학년 제한 없음. 단 8월 졸업예정자 제외");
+    expect(matchOne(b, user).status).not.toBe("excluded");
+  });
+
+  it("'대학생 또는 대학입학예정자'는 재학생도 대상이다", () => {
+    expect(matchOne(raw("[자격] 대학생 또는 대학입학예정자"), user).status).not.toBe("excluded");
+  });
+
+  it("[자격]의 '해당 대학 제외' 목록을 전용 대상으로 뒤집어 읽지 않는다", () => {
+    const b = raw("[자격] 대학 재학생. 한국방송통신대학교/사이버대학 제외");
+    expect(matchOne(b, user).status).not.toBe("excluded");
+  });
+
+  it("'서울/경기 소재 대학'처럼 시도를 나열해도 서울 대학은 대상이다", () => {
+    expect(matchOne(raw("[자격] 서울/경기 소재 대학교 재학생"), user).status).not.toBe("excluded");
+  });
+
+  it("'의과대학 소속이 아닌 재학생'을 의약계열 전용으로 읽지 않는다", () => {
+    const b = raw("[자격] 2026년도 1학기 의과/약학대학 소속이 아닌 재학생");
+    expect(matchOne(b, user).failed.some((m) => /의·한의·치·약학/.test(m))).toBe(false);
+  });
+
+  it("최종 학년(졸업반) 전용은 2학년에게 제외", () => {
+    expect(matchOne(raw("[자격] 국내 4년제 대학의 최종 학년 재학생"), user).status).toBe("excluded");
+  });
+
+  it("고교 졸업예정자(대학 진학 예정) 전용은 재학생에게 제외", () => {
+    const b = raw("[자격] 고등학교 졸업예정인 자 중 2026년 3월 대학 진학이 확정된 학생");
+    expect(matchOne(b, user).status).toBe("excluded");
+  });
+
+  it("다른 대학 전용은 제외하되, 내 대학이 포함되면 유지", () => {
+    expect(matchOne(raw("[자격] 서울대학교 재학생"), user).status).toBe("excluded");
+    expect(matchOne(raw("[자격] 서강대학교 재학생"), user).status).not.toBe("excluded");
+  });
+
+  it("'국내 4년제 대학' 같은 일반 표현은 특정 대학으로 오인하지 않는다", () => {
+    expect(matchOne(raw("[자격] 국내 4년제 대학 재학생"), user).status).not.toBe("excluded");
+  });
+
+  it("[지역거주]의 다른 시도 요건은 제외, 서울이면 유지", () => {
+    const b = raw("[지역거주] 본인 또는 보호자가 전라북도에 3년 이상 주민등록을 두고 거주");
+    expect(matchOne(b, user).status).toBe("excluded");
+    expect(matchOne(b, { ...user, region: "전북특별자치도" }).status).not.toBe("excluded");
+  });
+
+  it("[지역거주]가 '관내'뿐이면 단정하지 않고 조건 확인으로 분류", () => {
+    const b = raw("[지역거주] 공고일 현재 관내에 주소를 두고 1년 이상 거주한 자");
+    expect(matchOne(b, user).status).toBe("review");
+  });
+
+  it("문중(성씨) 장학회는 조건 확인으로 분류", () => {
+    expect(matchOne(raw("[자격] 풍양조씨인 자 성적이 우수한 대학 재학생"), user).status).toBe("review");
+  });
+
+  it("특정 전공자 전용은 조건 확인, 이공계 전체 대상은 유지", () => {
+    expect(matchOne(raw("[자격] 지질/지구물리/자원공학 등 자원개발 유관 전공자"), user).status).toBe("review");
+    expect(matchOne(raw("[자격] 이공계열 전공자 중 성적 우수자"), user).status).not.toBe("review");
+  });
+
+  it("[선발인원]에 학과를 못박으면 다른 학과에겐 조건 확인", () => {
+    const b = raw("[자격] 2학년~4학년 재학중인 학생\n[선발인원] 화학과 2명 화학공학과 2명");
+    expect(matchOne(b, user).status).toBe("review");
+    expect(matchOne(b, { ...user, major: "화학공학과" }).status).not.toBe("review");
+  });
+
+  it("의·약학 대학 전용은 공학계열에게 제외, '포함' 확대 문구는 제외하지 않는다", () => {
+    expect(matchOne(raw("[자격] 한의과대학 재학생"), user).status).toBe("excluded");
+    const wide = raw("[자격] 대학(전문대 및 의학전문대학원 포함)에 재학중인 자");
+    expect(matchOne(wide, user).status).not.toBe("excluded");
+  });
+
+  it("백분위(100점 만점) 성적 요건은 단정하지 않고 조건 확인", () => {
+    const b = raw("[성적] 직전학기 성적이 평균 94점(100점 만점) 이상인 학생");
+    expect(matchOne(b, user).status).toBe("review");
+  });
+
+  it("자격 근거가 요약뿐인 복지로 항목은 '받을 수 있음'으로 올리지 않는다", () => {
+    const b: Benefit = {
+      ...base,
+      id: "bokjiro-central:WLF00000000",
+      name: "연탄쿠폰",
+      rawConditionText: "[요약] 난방비 부담경감을 위해 차액분을 쿠폰으로 지원합니다.",
+    };
+    expect(matchOne(b, user).status).not.toBe("eligible");
+  });
+
+  it("대학생과 무관한 대상의 복지서비스는 제외", () => {
+    const b: Benefit = {
+      ...base,
+      id: "bokjiro-central:WLF00000001",
+      name: "학교우유급식",
+      rawConditionText: "[요약] 초·중·고 학생에게 우유를 공급합니다.",
+    };
+    expect(matchOne(b, user).status).toBe("excluded");
+  });
+
+  it("직전학기 요건은 '전학기 평점' 표기로도 인식한다", () => {
+    const b = raw("[성적] 전학기 성적 평점 3.8/4.5 이상인 자");
+    expect(matchOne(b, { ...user, lastGpa: 3.0 }).status).toBe("excluded");
+    expect(matchOne(b, { ...user, lastGpa: 4.3 }).status).not.toBe("excluded");
+  });
 });
