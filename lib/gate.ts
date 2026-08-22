@@ -14,6 +14,7 @@ export type PackId = keyof typeof PACKS;
 export const FREE_COOKIE = "jf_free";
 
 export function paywallEnabled(): boolean {
+  if (process.env.PAYWALL_DISABLED === "1") return false;
   return Boolean(
     process.env.TOSS_SECRET_KEY &&
       process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY &&
