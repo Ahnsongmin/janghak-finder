@@ -25,7 +25,7 @@ export const SIDO = [
 /** 소득분위 선택지 (한국장학재단 학자금지원구간 1~10) */
 export const INCOME_OPTIONS = [
   { value: 0, label: "모름 / 선택 안 함" },
-  { value: 1, label: "1구간 (기초·차상위 포함 최저)" },
+  { value: 1, label: "1구간" },
   { value: 2, label: "2구간" },
   { value: 3, label: "3구간" },
   { value: 4, label: "4구간" },
@@ -34,7 +34,7 @@ export const INCOME_OPTIONS = [
   { value: 7, label: "7구간" },
   { value: 8, label: "8구간" },
   { value: 9, label: "9구간" },
-  { value: 10, label: "10구간 (최고)" },
+  { value: 10, label: "10구간" },
 ] as const;
 
 /** 재학/학력 상태 */
