@@ -17,17 +17,22 @@ const SHOWCASE = [
 ];
 
 // 시즌 공지 — 마감일이 지나면 자동으로 사라진다(다시는 stale 안 됨).
-// 한국장학재단 2026 2학기 일정. 새 마감(2차 등)이 확정되면 여기에 추가만 하면 됨.
+// 한국장학재단 2026 2학기 일정. 새 마감이 확정되면 여기에 추가만 하면 됨.
 function currentNotice(now = new Date()): { label: string; emphasis: string } | null {
   const deadline = (y: number, m: number, d: number, h: number) =>
     new Date(y, m - 1, d, h, 0, 0);
-  // 1차 신청(6/22 18시)은 종료. 서류제출·가구원동의는 6/29 18시까지 진행 중.
-  if (now <= deadline(2026, 6, 29, 18))
+  // 2차 신청: 8/12(수) 09:00 ~ 9/9(수) 18:00 (대학 공식 장학공지 다수 확인, 2026-08-22)
+  if (now <= deadline(2026, 9, 9, 18))
     return {
-      label: "2학기 국가장학금 1차 서류제출·가구원동의",
-      emphasis: "6월 29일(월) 18시까지",
+      label: "2학기 국가장학금 2차 신청",
+      emphasis: "9월 9일(수) 18시 마감",
     };
-  // 2학기 2차 신청 일정은 한국장학재단 별도 공지(미정) → 확정 시 분기 추가.
+  // 2차 서류제출·가구원 정보제공 동의: ~9/16(수) 18:00
+  if (now <= deadline(2026, 9, 16, 18))
+    return {
+      label: "2학기 국가장학금 2차 서류제출·가구원동의",
+      emphasis: "9월 16일(수) 18시까지",
+    };
   return null;
 }
 
