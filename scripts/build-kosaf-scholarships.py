@@ -147,6 +147,25 @@ def clean(s: str) -> str:
 # foundation-scholarships.json 수동 보강분과 겹치는 재단 — CSV판 제외(정밀 매칭본 우선)
 DEDUP_KW = ["관정", "정몽구", "운해", "종근당"]
 
+# ── 공식 출처 확인 수동 보정 ──────────────────────────────────────────
+# CSV 원본이 누락·구버전인 필드를 재단 공식 사이트에서 확인해 덮어쓴다(재빌드에도 유지).
+# key = (운영기관명 포함 키워드, 상품명 포함 키워드 — 빈 문자열이면 기관 전체)
+OVERRIDES = [
+    # 구 도메인 hobanfoundation.or.kr 폐쇄 — 공식 사이트 hobansf.or.kr (2026-08-22 접속 확인)
+    (("호반장학재단", ""), {"applyUrl": "https://www.hobansf.or.kr/"}),
+    # 재단 공식 공지 '2026년도 제9기 장학생 선발 안내'(kcffd.org)에 소득분위 9분위 이하 명시 (2026-08-22 확인)
+    (("KC미래장학재단", "케이씨미래"), {
+        "incomeMax": 9,
+        "incomeNote": "한국장학재단 소득분위 9분위 이하 (재단 공식 공지 확인: 2026-08-22)",
+    }),
+]
+
+def apply_overrides(benefit: dict, org: str, name: str) -> dict:
+    for (org_kw, name_kw), patch in OVERRIDES:
+        if org_kw in org and (not name_kw or name_kw in name):
+            benefit.update(patch)
+    return benefit
+
 # 상품명이 일반적이라 단독으론 무의미 → 기관명을 제목에 붙인다
 GENERIC_NAMES = {
     "대학생", "장학생", "학부장학생", "국내장학생", "신입생", "재학생", "대학원생",
@@ -310,6 +329,7 @@ def build():
         }
         if income_note:
             benefit["incomeNote"] = income_note
+        benefit = apply_overrides(benefit, org, name)
         # None 값 제거(스키마 깔끔)
         benefit = {k: v for k, v in benefit.items() if v is not None}
         out.append(benefit)

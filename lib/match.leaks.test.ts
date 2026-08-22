@@ -204,6 +204,39 @@ describe("2026-08-22 전수 감사에서 발견된 유형들", () => {
   });
 });
 
+describe("2026-08-22 저녁 신고분 — 공식 출처 확인 보정 포함", () => {
+  it("김희경유럽정신문화재단 국내학부장학생(유럽인문학 전공)은 기계공학과에게 제외", () => {
+    const b = findByName("국내학부장학생", "김희경");
+    expect(b, "데이터에 김희경 국내학부장학생 존재").toBeTruthy();
+    const r = matchOne(b!, user);
+    expect(r.status).toBe("excluded");
+    expect(r.failed.some((m) => /인문학/.test(m))).toBe(true);
+    // 인문계열(철학과) 사용자에겐 제외되지 않아야 함
+    expect(matchOne(b!, { ...user, major: "철학과" }).status).not.toBe("excluded");
+  });
+
+  it("케이씨미래장학금은 공식 공지 기준 소득 9분위 이하 — 10분위 제외, 9분위 유지", () => {
+    const b = findByName("케이씨미래", "KC미래장학재단");
+    expect(b, "데이터에 케이씨미래장학금 존재").toBeTruthy();
+    expect(b!.incomeMax).toBe(9);
+    expect(matchOne(b!, user).status).toBe("excluded");
+    expect(matchOne(b!, { ...user, income: 9 }).status).not.toBe("excluded");
+  });
+
+  it("호반장학생 applyUrl은 폐쇄된 구 도메인이 아닌 공식 사이트여야 한다", () => {
+    const b = findByName("호반장학생", "호반장학재단");
+    expect(b, "데이터에 호반장학생 존재").toBeTruthy();
+    expect(b!.applyUrl).toBe("https://www.hobansf.or.kr/");
+  });
+
+  it("매칭 결과의 passed 목록에 빈 문자열이 없다(빈 체크칩 방지)", () => {
+    for (const b of getBenefits().slice(0, 500)) {
+      const r = matchOne(b, user);
+      expect(r.passed.every((m) => m.length > 0), b.name).toBe(true);
+    }
+  });
+});
+
 describe("[자격] 가계곤란 신호 — 우대는 제외 사유가 아님", () => {
   const base: Benefit = {
     id: "test:means",

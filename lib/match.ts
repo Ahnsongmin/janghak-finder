@@ -346,7 +346,7 @@ const UNDERGRAD_OK = /학부|학사|대학생/;
 // 장애 학생 전용 — "재학중인 장애학생/시각장애인/정신장애를 가진" 등.
 // '장애 학생은 성적기준 미적용' 같은 예외 조항(장애 인접 문구)은 전용이 아니다.
 const DISABILITY_ONLY =
-  /(?:시각|청각|지체|발달|중증|정신)?\s*장애(?:인|학생|\s*학생|\s*대학생)|장애를\s*가진/;
+  /(?:시각|청각|지체|발달|중증|정신)?\s*장애(?:인|학생|\s*학생|\s*대학생|\s*당사자)|장애를\s*가진/;
 const DISAB_NOT_EXCLUSIVE = /장애[^\n]{0,14}(?:미적용|면제|예외)/;
 
 // 외국인·개발도상국 유학생 전용 (뒤에 '신청 가능/포함' 류가 붙으면 확대 조항이라 전용 아님)
@@ -368,6 +368,10 @@ const EXISTING_SCHOLAR = /\d+\s*기에?\s*해당하는\s*장학생|기존\s*장�
 
 // "X관련학과" 전공 제한 — 사용자의 학과와 느슨 비교(불일치 시 확인으로 분리, 분류가 애매해 제외는 안 함)
 const MAJOR_RESTRICT = /([가-힣]{2,8})\s*관련\s*학과/;
+
+// 인문학 전공 전용 — "유럽인문학 주 전공자(어학 문학 철학 등)" 등. '어학연수' 오탐 방지 위해 전공 필수.
+const HUM_MAJOR_ONLY =
+  /(?:유럽)?인문학[^\n]{0,8}(?:주\s*)?전공|(?:어학|(?<!천)문학|철학|(?<!의)사학)[^\n]{0,4}(?:주\s*)?전공/;
 
 // 사고·순직 유자녀/유족 전용 — 해당 신분은 선택지(플래그)로 표현 불가한 특수 전용.
 // 문중·종친회 전용과 같은 원칙: 해당자는 이미 그 재단을 알고 있으므로 일반 사용자에겐 제외.
@@ -427,6 +431,15 @@ function checkRawEligibility(b: Benefit, u: UserProfile): { v: Verdict; msg: str
       return { v: "fail", msg: `예체능(${artM[1]}) 전공 대상 — 내 계열(${fac})은 해당 없음` };
     }
     return { v: "unknown", msg: `예체능(${artM[1]}) 전공 대상 — 해당 시에만` };
+  }
+
+  // 4-1) 인문학(어학·문학·철학 등) 전공 전용 — 같은 방식
+  if (HUM_MAJOR_ONLY.test(jagyeok)) {
+    const fac = resolveFaculty(u.faculty, u.major);
+    if (fac && fac !== "인문계열") {
+      return { v: "fail", msg: `인문학(어학·문학·철학 등) 전공 대상 — 내 계열(${fac})은 해당 없음` };
+    }
+    return { v: "unknown", msg: "인문학(어학·문학·철학 등) 전공 대상 — 해당 시에만" };
   }
 
   // 5) 사고·순직 유자녀/유족 전용 — 보훈·장애 플래그 보유자에겐 확인으로, 그 외엔 제외
@@ -663,7 +676,8 @@ export function matchOne(benefit: Benefit, user: UserProfile): MatchResult {
     checkLifeStageGender(benefit, user),
   ];
 
-  const passed = checks.filter((c) => c.v === "pass").map((c) => c.msg);
+  // 빈 msg(판단 보류형 pass)는 결과 카드에 빈 체크칩으로 보이므로 걸러낸다
+  const passed = checks.filter((c) => c.v === "pass" && c.msg).map((c) => c.msg);
   const unknown = checks.filter((c) => c.v === "unknown").map((c) => c.msg);
   const failed = checks.filter((c) => c.v === "fail").map((c) => c.msg);
 
