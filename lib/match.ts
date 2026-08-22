@@ -838,6 +838,8 @@ function checkLifeStageGender(b: Benefit, u: UserProfile): { v: Verdict; msg: st
   // 6) 복지로 요약문 기반 대상 판별 — 이름만으로는 대상을 알 수 없는 복지서비스를 걸러낸다.
   //    학생·청년 신호가 있으면 대학생에게도 해당할 수 있으므로 적용하지 않는다(누락 방지).
   //    사업명에만 '청년'이 있고 요약엔 없는 경우가 있어 이름까지 함께 본다.
+  //    적용 범위는 복지로([요약] 보유)로 한정한다. 온통청년 설명문까지 넓히면
+  //    청년 인재양성·일자리 사업이 '농어업인/근로자' 문구 하나로 잘못 제외된다(실측 확인).
   const yoyakScope = `${b.name} ${yoyak}`;
   if (yoyak && !STUDENT_SIGNAL.test(yoyakScope) && !ACADEMIC_GUARD.test(yoyak) && isUniversityStudent(u)) {
     for (const [re, label] of YOYAK_TARGETS) {
