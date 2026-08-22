@@ -4,6 +4,7 @@
 #       구조화 매칭은 명확한 것(지역·계열·대학생 여부)만. 누락 방지를 위해 애매하면 '전국/무관'.
 import csv, json, io, re, sys
 from datetime import date
+from urllib.parse import urlparse
 
 SRC = "data/_raw_kosaf_univ.csv"
 OUT = "data/kosaf-scholarships.json"
@@ -166,6 +167,50 @@ def apply_overrides(benefit: dict, org: str, name: str) -> dict:
             benefit.update(patch)
     return benefit
 
+
+# DNS 2회 조회(원형+www 변형)로 확인한 폐쇄·오타 도메인 (2026-08-22 전수 점검, 71개).
+# 죽은 링크 대신 한국장학재단 포털로 안내한다. 살아난 도메인은 다음 점검 때 목록에서 빼면 됨.
+DEAD_DOMAINS = {
+    "bi.donga.ac.kr", "blog.daum.net", "bonghwagyobalwi.or.k", "chungo.or.kr",
+    "city.hygn.go.kr", "cssf.cheonan.go.kr", "cukalumni.com", "dalseong.deagu.kr",
+    "etongilnanum.com", "geumsanedu.or.kr", "hanmh.goean.kr", "hitejinroholdings.co.kr",
+    "hmgscholar.recruiter.co.kr", "hoi.chilgok.go.kr", "insong.dothome.co.kr",
+    "insungscholar.com", "janghak.gyeongju.go.kr", "jungamf.co.kr", "koreashe.rog",
+    "krhff.or.kr", "leewhajanghak.co.kr", "m.hanananum.com", "munmak.wonju.go.kr",
+    "pcscholarship.or.kr", "songwonfd.org", "spcscholarship.career.co.kr",
+    "www.airport", "www.ansanfys.orkr", "www.asanfoundaton.or.kr", "www.bcjh.or.kr",
+    "www.buaninjae.or.kr", "www.chrdf.or.kr", "www.cninjae.or.kr",
+    "www.daedongfoundation.com", "www.daumunwha.or.kr", "www.djnonghyup.com",
+    "www.donggujhh.or.kr", "www.euncheom.org", "www.gaheonsindoh.or.kr",
+    "www.gimjenh.com", "www.gimpojh.co.kr", "www.gjcsf.or.kr", "www.gsijhh.co.kr",
+    "www.guwonscholar.or.kr", "www.gyeongam.go.kr", "www.haedongfoundation.org",
+    "www.haenam.go.k", "www.hanwooborad.or.kr", "www.jbdream.or.kr", "www.jbitle.or.kr",
+    "www.jeongup.go.kr", "www.kidfuture.or.kr", "www.korst.or.kr", "www.krhff.or.kr",
+    "www.partnerskorea.org", "www.phsjihh.org", "www.rainbowyuth.or.kr",
+    "www.samilsaf.or.kr", "www.scak.or.kr", "www.scholarsip.eumseong.go.kr",
+    "www.scil.or.kr", "www.seosanscholar.or.kr", "www.seosansf.com",
+    "www.sokcho.gangwon.kr", "www.sunam107.or.kr", "www.wjewel.or.kr",
+    "www.xno39a11z6xj6xn4mb.com", "www.yeosu.nonghyup.co.kr",
+    "www.yoohanfoundation.or.kr", "www.yysc.or.kr", "yamirae.or.kr",
+    "hobanfoundation.or.kr", "www.hobanfoundation.or.kr",
+}
+
+FALLBACK_URL = "https://www.kosaf.go.kr"
+
+def resolve_apply_url(homepage: str) -> str:
+    """CSV 홈페이지 값 검증: '해당없음'류·형식 오류·폐쇄 도메인이면 한국장학재단 포털로 대체."""
+    h = (homepage or "").strip()
+    if not h:
+        return FALLBACK_URL
+    url = h if "://" in h else "http://" + h
+    try:
+        host = urlparse(url).netloc.split(":")[0].lower()
+    except ValueError:
+        return FALLBACK_URL
+    if "." not in host or host in DEAD_DOMAINS:
+        return FALLBACK_URL
+    return h
+
 # 상품명이 일반적이라 단독으론 무의미 → 기관명을 제목에 붙인다
 GENERIC_NAMES = {
     "대학생", "장학생", "학부장학생", "국내장학생", "신입생", "재학생", "대학원생",
@@ -323,7 +368,7 @@ def build():
             "genderOnly": elig.get("genderOnly"),
             "amount": support[:200] if support else None,
             "applyPeriod": apply_period,
-            "applyUrl": homepage or "https://www.kosaf.go.kr",
+            "applyUrl": resolve_apply_url(homepage),
             "rawConditionText": raw,
             "lastFetchedAt": date.today().isoformat(),
         }
